@@ -29,8 +29,10 @@ Install_SqlServer2019() {
 	systemctl status mssql-server --no-pager
 
 	echo "[Info] Installed sql server."
-	echo "[Info] To connect remotely, at ec2 instance, let allow firewall at port 1433 (for production, should also restrict incoming ip) as below:"
-	echo "[Info]   - Click to target ec2 server to open detail page -> Select tab Security -> Click Security groups -> Click Edit inbound rules -> Add TCP 1433 with source 0.0.0.0/0"
+	echo "To connect remotely, at ec2 instance, let allow firewall at port 1433 (for production, should also restrict incoming ip) as below:"
+	echo "  - Click to target ec2 server to open detail page"
+	echo "  - Select tab Security -> Click Security groups -> Click Edit inbound rules"
+	echo "  - Add TCP 1433 with source 0.0.0.0/0"
 }
 
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
@@ -48,8 +50,10 @@ Install_Nginx() {
 	sudo service nginx status
 
 	echo "[Info] Installed nginx."
-	echo "[Info] At ec2 instance, please allow firewall at port 80, 443 (for production, should also restrict incoming ip) as below:"
-	echo "  - Click to target ec2 server to open detail page -> Select tab Security -> Click Security groups -> Click Edit inbound rules -> Add TCP 80, 443 with source 0.0.0.0/0"
+	echo "At ec2 instance, please allow firewall at port 80, 443 (for production, should also restrict incoming ip) as below:"
+	echo "  - Click to target ec2 server to open detail page"
+	echo "  - Select tab Security -> Click Security groups -> Click Edit inbound rules"
+	echo "  - Add TCP 80, 443 with source 0.0.0.0/0"
 }
 
 # Ref: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
