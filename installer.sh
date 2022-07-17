@@ -1,0 +1,116 @@
+
+# At this time, MSSQL 2019 does not support for ubuntu 22.04. So we use ubuntu 20.04 instead.
+# Ref: https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-linux-ver15
+Install_SqlServer2019() {
+	printf "[Ask] Ubuntu 20.04 is required since it does not yet support for Ubuntu 22.04. Press y to continue? (y/*): "
+	read ans
+	if [[ ans != "y" ]]; then
+		echo "Aborted."
+		return
+	fi
+
+	echo "[Info] Installing sql server..."
+
+	# Import the public repository GPG keys
+	wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+
+	# Register the SQL Server Ubuntu repository
+	sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/20.04/mssql-server-2019.list)"
+
+	# Run the following commands to install SQL Server
+	sudo apt-get update
+	sudo apt-get install -y mssql-server
+
+	# Set the SA password and choose your edition
+	# For eg,. at staging: sa/Staging1234!
+	sudo /opt/mssql/bin/mssql-conf setup
+
+	# Verify that the service is running
+	systemctl status mssql-server --no-pager
+
+	echo "[Info] Installed sql server."
+	echo "[Info] To connect remotely, at ec2 instance, let allow firewall at port 1433 (for production, should also restrict incoming ip) as below:"
+	echo "[Info]   - Click to target ec2 server to open detail page -> Select tab Security -> Click Security groups -> Click Edit inbound rules -> Add TCP 1433 with source 0.0.0.0/0"
+}
+
+# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
+Install_Nginx() {
+	echo "[Info] Installing nginx..."
+
+	# After, ssh to server,
+	# let Update OS, Install nginx and Enable nginx at startup
+	sudo apt-get update
+	sudo apt-get install nginx
+	sudo systemctl enable nginx
+
+	# Below are nginx control commands
+	sudo service nginx start
+	sudo service nginx status
+
+	echo "[Info] Installed nginx."
+	echo "[Info] At ec2 instance, please allow firewall at port 80, 443 (for production, should also restrict incoming ip) as below:"
+	echo "  - Click to target ec2 server to open detail page -> Select tab Security -> Click Security groups -> Click Edit inbound rules -> Add TCP 80, 443 with source 0.0.0.0/0"
+}
+
+# Ref: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
+Install_Dotnet() {
+	echo "[Info] Installing dotnet..."
+
+	# Install package
+	cd ~
+	wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+	sudo dpkg -i packages-microsoft-prod.deb
+	rm packages-microsoft-prod.deb
+
+	# Install SDK for development
+	sudo apt-get update; \
+  sudo apt-get install -y apt-transport-https && \
+  sudo apt-get update && \
+  sudo apt-get install -y dotnet-sdk-6.0
+
+	# Install runtime (asp.net core)
+	sudo apt-get update; \
+  sudo apt-get install -y apt-transport-https && \
+  sudo apt-get update && \
+  sudo apt-get install -y aspnetcore-runtime-6.0
+
+	echo "[Info] Installed dotnet."
+}
+
+Install_Certbot() {
+	printf "[Ask] nginx, snap are required. Are they installed? (y/*): "
+	read ans
+	if [[ ans != "y" ]]; then
+		echo "Aborted."
+		return
+	fi
+
+	echo "[Info] Installing certbot..."
+
+	# Install certbot
+	# For uninstall: sudo apt remove certbot
+	sudo snap install core
+	sudo snap refresh core
+	sudo snap install --classic certbot
+	sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+	# Check grammar
+	sudo nginx -t
+
+	# If we use long domain name that needs edit nginx config,
+	# just comment out and change 64 -> 128: server_names_hash_bucket_size 128;
+	echo "[Ask] If we use long domain name, you maybe need increase server_names_hash_bucket_size of nginx config."
+	printf "Do you want to increase current value (64)? (y/*): "
+	read ans
+	if [[ ans == "y" ]]; then
+		printf "[Ask] Enter new integer value: "
+		read newValue
+		# Increase size by regex replacing.
+		sudo sed -i -e "'s/# server_names_hash_bucket_size 64;/server_names_hash_bucket_size ${newValue};/g'" /etc/nginx/nginx.conf
+
+		# Reload nginx config
+		sudo service nginx reload
+	fi
+
+	echo "[Info] Installed certbot."
+}
