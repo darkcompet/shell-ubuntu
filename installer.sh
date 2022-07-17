@@ -4,7 +4,7 @@
 Install_SqlServer2019() {
 	printf "[Ask] Ubuntu 20.04 is required since it does not yet support for Ubuntu 22.04. Press y to continue? (y/*): "
 	read ans
-	if [[ ans != "y" ]]; then
+	if [[ $ans != "y" ]]; then
 		echo "Aborted."
 		return
 	fi
@@ -84,7 +84,7 @@ Install_Dotnet() {
 Install_Certbot() {
 	printf "[Ask] nginx, snap are required. Are they installed? (y/*): "
 	read ans
-	if [[ ans != "y" ]]; then
+	if [[ $ans != "y" ]]; then
 		echo "Aborted."
 		return
 	fi
@@ -106,7 +106,7 @@ Install_Certbot() {
 	echo "[Ask] If we use long domain name, you maybe need increase server_names_hash_bucket_size of nginx config."
 	printf "Do you want to increase current value (64)? (y/*): "
 	read ans
-	if [[ ans == "y" ]]; then
+	if [[ $ans == "y" ]]; then
 		printf "[Ask] Enter new integer value: "
 		read newValue
 		# Increase size by regex replacing.
