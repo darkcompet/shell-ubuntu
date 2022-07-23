@@ -28,7 +28,7 @@ Install_SqlServer2019() {
 	# Verify that the service is running
 	systemctl status mssql-server --no-pager
 
-	echo "[Info] Installed sql server."
+	echo "=> Installed sql server."
 	echo "To connect remotely, at ec2 instance, let allow firewall at port 1433 (for production, should also restrict incoming ip) as below:"
 	echo "  - Click to target ec2 server to open detail page"
 	echo "  - Select tab Security -> Click Security groups -> Click Edit inbound rules"
@@ -49,7 +49,7 @@ Install_Nginx() {
 	sudo service nginx start
 	sudo service nginx status
 
-	echo "[Info] Installed nginx."
+	echo "=> Installed nginx."
 	echo "At ec2 instance, please allow firewall at port 80, 443 (for production, should also restrict incoming ip) as below:"
 	echo "  - Click to target ec2 server to open detail page"
 	echo "  - Select tab Security -> Click Security groups -> Click Edit inbound rules"
@@ -78,17 +78,10 @@ Install_Dotnet() {
   sudo apt-get update && \
   sudo apt-get install -y aspnetcore-runtime-6.0
 
-	echo "[Info] Installed dotnet."
+	echo "=> Installed dotnet."
 }
 
 Install_Certbot() {
-	printf "[Ask] nginx, snap are required. Are they installed? (y/*): "
-	read ans
-	if [[ $ans != "y" ]]; then
-		echo "Aborted."
-		return
-	fi
-
 	echo "[Info] Installing certbot..."
 
 	# Install certbot
@@ -116,7 +109,7 @@ Install_Certbot() {
 		sudo service nginx reload
 	fi
 
-	echo "[Info] Installed certbot."
+	echo "=> Installed certbot."
 }
 
 _InstallAndSetupNodejs_PreSetup() {
