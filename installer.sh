@@ -118,3 +118,30 @@ Install_Certbot() {
 
 	echo "[Info] Installed certbot."
 }
+
+_InstallAndSetupNodejs_PreSetup() {
+	# Install nvm (node version management)
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+
+	echo "[Warn] Plesae exit terminal and re-enter to continue setup."
+}
+
+_InstallAndSetupNodejs_PostSetup() {
+	# Install and Use node with specific version
+	# Note: 18 means we use latest version, for eg,. 18.2.0
+	# After installed, should reload terminal (for eg,. by exit and re-enter to server)
+	nvm install $NODE_VERSION
+
+	# To switch nodejs version, just use
+	nvm use $NODE_VERSION
+
+	# Create symbol link from /usr/bin to our installed node, npm
+	sudo unlink /usr/bin/node
+	sudo unlink /usr/bin/npm
+	sudo ln -s "$(which node)" /usr/bin/node
+	sudo ln -s "$(which npm)" /usr/bin/npm
+
+	# Check versions
+	node -v
+	npm -v
+}
