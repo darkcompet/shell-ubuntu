@@ -36,7 +36,10 @@ Install_SqlServer2019() {
 }
 
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-22-04
-Install_Mysql() {
+Install_MySQL() {
+	db_name=$1
+	host=$2
+
 	# Update the package index on server
 	sudo apt update
 
@@ -48,12 +51,12 @@ Install_Mysql() {
 
 	# Config Mysql root account
 	sudo mysql
-	ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+	ALTER USER "'root'@'${host}'" IDENTIFIED WITH mysql_native_password BY 'password';
 	exit
 	mysql -u root -p
-	ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
+	ALTER USER "'root'@'${host}'" IDENTIFIED WITH auth_socket;
 
-	# Run secure script
+	# Run secure script with root previledge
 	# Note that even though you’ve set a password for the root MySQL user, this user is not currently
 	# configured to authenticate with a password when connecting to the MySQL shell.
 	sudo mysql_secure_installation
@@ -62,19 +65,19 @@ Install_Mysql() {
 	# Note: we are connecting to root account via auth_socket, not use native password.
 	sudo mysql
 	mysql -u root -p
-	CREATE USER 'phongthuydainam'@'localhost' IDENTIFIED WITH authentication_plugin BY 'password!';
+	CREATE USER "'${db_name}'@'${host}'" IDENTIFIED WITH authentication_plugin BY 'password';
 
-	# Grant access to all tables of `phongthuydainam` db for our user
-	GRANT PRIVILEGE ON phongthuydainam.* TO 'phongthuydainam'@'localhost';
+	# Grant access to all tables of db for our user
+	GRANT PRIVILEGE ON ${db_name}.* TO "'${db_name}'@'${host}'";
 	FLUSH PRIVILEGES;
 	exit
 
 	# For the future login
-	mysql -u phongthuydainam -p
+	echo "[Note] For login: mysql -u ${db_name} -p"
 
 	# Check service status
 	systemctl status mysql.service
-	echo "If service is not started, go with: sudo systemctl start mysql"
+	echo "[Note] If service is not started, go with: sudo systemctl start mysql"
 }
 
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
