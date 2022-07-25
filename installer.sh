@@ -37,9 +37,6 @@ Install_SqlServer2019() {
 
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-22-04
 Install_MySQL() {
-	db_name=$1
-	host=$2
-
 	# Update the package index on server
 	sudo apt update
 
@@ -49,31 +46,37 @@ Install_MySQL() {
 	# Start service
 	sudo systemctl start mysql.service
 
-	# Config Mysql root account
+	echo "[Warn] Please continue with manual configure MySQL"
+}
+__Manual_Config_MySQL() {
+	# [Run mysql_secure_installation script]
+	# We need root priviledge to run mysql_secure_installation script.
+	# Since by default MySQL 8.0 uses auth_socket for authentication,
+	# so we will adjust to authenticate with id/pwd instead, then revert after done.
 	sudo mysql
-	ALTER USER "'root'@'${host}'" IDENTIFIED WITH mysql_native_password BY 'password';
-	exit
-	mysql -u root -p
-	ALTER USER "'root'@'${host}'" IDENTIFIED WITH auth_socket;
+	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root1234!';
+	mysql> \q
 
-	# Run secure script with root previledge
-	# Note that even though you’ve set a password for the root MySQL user, this user is not currently
-	# configured to authenticate with a password when connecting to the MySQL shell.
+	# Run secure script with root previledge (enter root password if be asked).
+	# Yes all for more secure.
 	sudo mysql_secure_installation
 
-	# Create our account to connect via auth_socket (not using native password).
-	# Note: we are connecting to root account via auth_socket, not use native password.
-	sudo mysql
+	# Create our account
+	sudo mysql -u root -p
+	# [Option 1] Use authentication_plugin will prevent remote-connection, so client cannot interact with db.
+	# mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED WITH authentication_plugin BY 'password';
+	# [Option 2] For test purpose, use id/pwd so client can connect to db, but it is less security than authentication_plugin.
+	mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED BY 'Test1234!';
+	# mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+	mysql> GRANT ALL ON phongthuydainam.* TO 'darkcompet'@'localhost';
+	mysql> FLUSH PRIVILEGES;
+	mysql> \q
+
+	# Rever root authentication to auth_socket
 	mysql -u root -p
-	CREATE USER "'${db_name}'@'${host}'" IDENTIFIED WITH authentication_plugin BY 'password';
-
-	# Grant access to all tables of db for our user
-	GRANT PRIVILEGE ON ${db_name}.* TO "'${db_name}'@'${host}'";
-	FLUSH PRIVILEGES;
-	exit
-
-	# For the future login
-	echo "[Note] For login: mysql -u ${db_name} -p"
+	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
+	mysql> \q
+	# Now, we can once again connect to MySQL as your root user using the [sudo mysql] command.
 
 	# Check service status
 	systemctl status mysql.service
