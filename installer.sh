@@ -35,6 +35,48 @@ Install_SqlServer2019() {
 	echo "  - Add TCP 1433 with source 0.0.0.0/0"
 }
 
+# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-22-04
+Install_Mysql() {
+	# Update the package index on server
+	sudo apt update
+
+	# Install the mysql-server package
+	sudo apt install mysql-server
+
+	# Start service
+	sudo systemctl start mysql.service
+
+	# Config Mysql root account
+	sudo mysql
+	ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+	exit
+	mysql -u root -p
+	ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
+
+	# Run secure script
+	# Note that even though you’ve set a password for the root MySQL user, this user is not currently
+	# configured to authenticate with a password when connecting to the MySQL shell.
+	sudo mysql_secure_installation
+
+	# Create our account to connect via auth_socket (not using native password).
+	# Note: we are connecting to root account via auth_socket, not use native password.
+	sudo mysql
+	mysql -u root -p
+	CREATE USER 'phongthuydainam'@'localhost' IDENTIFIED WITH authentication_plugin BY 'password!';
+
+	# Grant access to all tables of `phongthuydainam` db for our user
+	GRANT PRIVILEGE ON phongthuydainam.* TO 'phongthuydainam'@'localhost';
+	FLUSH PRIVILEGES;
+	exit
+
+	# For the future login
+	mysql -u phongthuydainam -p
+
+	# Check service status
+	systemctl status mysql.service
+	echo "If service is not started, go with: sudo systemctl start mysql"
+}
+
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
 Install_Nginx() {
 	echo "[Info] Installing nginx..."
