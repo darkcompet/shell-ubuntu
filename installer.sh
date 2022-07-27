@@ -163,7 +163,7 @@ _InstallAndSetupNodejs_PreSetup() {
 	# Install nvm (node version management)
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
-	echo "[Warn] Plesae exit terminal and re-enter to continue setup."
+	echo "[Warn] Please exit terminal and re-enter to continue setup."
 }
 
 _InstallAndSetupNodejs_PostSetup() {
