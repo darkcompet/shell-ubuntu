@@ -159,14 +159,14 @@ Install_Certbot() {
 	echo "=> Installed certbot."
 }
 
-_InstallAndSetupNodejs_PreSetup() {
+InstallAndSetupNodejs_PreSetup() {
 	# Install nvm (node version management)
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
 	echo "[Warn] Please exit terminal and re-enter to continue setup."
 }
 
-_InstallAndSetupNodejs_PostSetup() {
+InstallAndSetupNodejs_PostSetup() {
 	# Install and Use node with specific version
 	# Note: 18 means we use latest version, for eg,. 18.2.0
 	# After installed, should reload terminal (for eg,. by exit and re-enter to server)
