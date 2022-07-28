@@ -48,6 +48,7 @@ Install_MySQL() {
 
 	echo "[Warn] Please continue with manual configure MySQL"
 }
+# Caller should follow it after installed MySQL.
 __Manual_Config_MySQL() {
 	# [Run mysql_secure_installation script]
 	# We need root priviledge to run mysql_secure_installation script.
