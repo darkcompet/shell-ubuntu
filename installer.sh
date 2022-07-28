@@ -49,7 +49,7 @@ Install_MySQL() {
 	echo "[Warn] Please continue with manual configure MySQL"
 }
 # Caller should follow it after installed MySQL.
-__Manual_Config_MySQL() {
+__MySQL_Manual_Config() {
 	# [Run mysql_secure_installation script]
 	# We need root priviledge to run mysql_secure_installation script.
 	# Since by default MySQL 8.0 uses auth_socket for authentication,
@@ -99,7 +99,7 @@ Install_Nginx() {
 	sudo service nginx status
 
 	echo "=> Installed nginx."
-	echo "At ec2 instance, please allow firewall at port 80, 443 (for production, should also restrict incoming ip) as below:"
+	echo "Please allow firewall at port 80, 443 (for production, should also restrict incoming ip), for eg,. at ec2:"
 	echo "  - Click to target ec2 server to open detail page"
 	echo "  - Select tab Security -> Click Security groups -> Click Edit inbound rules"
 	echo "  - Add TCP 80, 443 with source 0.0.0.0/0"
