@@ -129,6 +129,7 @@ Install_Dotnet() {
 	echo "=> Installed dotnet."
 }
 
+# Ref: https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-22-04
 Install_Certbot() {
 	echo "[Info] Installing certbot..."
 
@@ -160,13 +161,13 @@ Install_Certbot() {
 	echo "=> Installed certbot."
 }
 
+# Ref: https://github.com/nvm-sh/nvm#installing-and-updating
 InstallAndSetupNodejs_PreSetup() {
 	# Install nvm (node version management)
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
 	echo "[Warn] Please exit terminal and re-enter to continue setup."
 }
-
 InstallAndSetupNodejs_PostSetup() {
 	# Install and Use node with specific version
 	# Note: 18 means we use latest version, for eg,. 18.2.0
@@ -177,10 +178,10 @@ InstallAndSetupNodejs_PostSetup() {
 	nvm use $NODE_VERSION
 
 	# Create symbol link from /usr/bin to our installed node, npm
-	sudo unlink /usr/bin/node
-	sudo unlink /usr/bin/npm
-	sudo ln -s "$(which node)" /usr/bin/node
-	sudo ln -s "$(which npm)" /usr/bin/npm
+	sudo unlink /usr/local/bin/node
+	sudo unlink /usr/local/bin/npm
+	sudo ln -s "$(which node)" /usr/local/bin/node
+	sudo ln -s "$(which npm)" /usr/local/bin/npm
 
 	# Check versions
 	node -v
