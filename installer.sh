@@ -182,18 +182,12 @@ InstallAndSetupNodejs_ViaNodeSource() {
 # Note: nvm is used to install node per user (not for all users)
 # Ref: https://github.com/nvm-sh/nvm#installing-and-updating
 InstallAndSetupNodejs_ViaNpm_PreSetup() {
-	printf "Install nvm at /usr/local/nvm? (y/*): "
-	read ans
-	if [[ $ans != "y" ]]; then
-		echo "Aborted"
-		return
-	fi
-
 	# Install nvm (node version management)
 	# Need change owner back later at post-phase
-	sudo mkdir -p /usr/local/nvm
-	sudo chown $USER:$USER /usr/local/nvm
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | NVM_DIR=/usr/local/nvm bash
+	# sudo mkdir -p /usr/local/nvm
+	# sudo chown $USER:$USER /usr/local/nvm
+	# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | NVM_DIR=/usr/local/nvm bash
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
 	echo "[Warn] Please exit terminal and re-enter to continue setup."
 }
@@ -208,18 +202,15 @@ InstallAndSetupNodejs_ViaNpm_PostSetup() {
 
 	# Make nodejs available for all users by create symbol link at /usr/local/bin to our installed node, npm
 	# Before it, we need change back owner to root so other users can use node, npm
-	sudo chown root:root /usr/local/nvm
+	# sudo chown root:root /usr/local/nvm
 	sudo unlink /usr/local/bin/node
 	sudo unlink /usr/local/bin/npm
 	sudo ln -s "$(which node)" /usr/local/bin/node
 	sudo ln -s "$(which npm)" /usr/local/bin/npm
 
+	# Check path and version
 	ll /usr/local/bin/node
 	ll /usr/local/bin/npm
-
-	# Check path and version
-	which node
-	which npm
 	node -v
 	npm -v
 
