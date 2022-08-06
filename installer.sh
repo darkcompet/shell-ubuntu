@@ -187,20 +187,14 @@ InstallAndSetupNodejs_ViaNpm_PreSetup() {
 
 	echo "[Warn] Please exit terminal and re-enter to continue setup."
 }
+# After installed, should reload terminal (for eg,. source ~/.bashrc, or exit -> re-enter to server)
 InstallAndSetupNodejs_ViaNpm_PostSetup() {
 	# Install and Use node with specific version
 	# Note: 18 means we use latest version, for eg,. 18.2.0
-	# After installed, should reload terminal (for eg,. by exit and re-enter to server)
 	nvm install $NODE_VERSION
 
-	# To switch nodejs version, just use
+	# Switch nodejs version, just use
 	nvm use $NODE_VERSION
-
-	# Create symbol link from /usr/bin to our installed node, npm
-	# sudo unlink /usr/local/bin/node
-	# sudo unlink /usr/local/bin/npm
-	# sudo ln -s "$(which node)" /usr/local/bin/node
-	# sudo ln -s "$(which npm)" /usr/local/bin/npm
 
 	# Check path and version
 	which node
