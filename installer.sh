@@ -189,7 +189,7 @@ InstallAndSetupNodejs_ViaNpm_PreSetup() {
 	# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | NVM_DIR=/usr/local/nvm bash
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
-	echo "[Warn] Please exit terminal and re-enter to continue setup."
+	echo "[Warn] Please run above command to add nvm to bash. Or otherwise, exit terminal and re-enter to continue setup."
 }
 # After installed, should reload terminal (for eg,. source ~/.bashrc, or exit -> re-enter to server)
 InstallAndSetupNodejs_ViaNpm_PostSetup() {
