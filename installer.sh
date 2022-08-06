@@ -178,10 +178,14 @@ InstallAndSetupNodejs_PostSetup() {
 	nvm use $NODE_VERSION
 
 	# Create symbol link from /usr/bin to our installed node, npm
-	sudo unlink /usr/local/bin/node
-	sudo unlink /usr/local/bin/npm
-	sudo ln -s "$(which node)" /usr/local/bin/node
-	sudo ln -s "$(which npm)" /usr/local/bin/npm
+	# sudo unlink /usr/local/bin/node
+	# sudo unlink /usr/local/bin/npm
+	# sudo ln -s "$(which node)" /usr/local/bin/node
+	# sudo ln -s "$(which npm)" /usr/local/bin/npm
+
+	# Copy node, npm to /usr/local/bin
+	sudo cp $(which node) /usr/local/bin
+	sudo cp $(which npm) /usr/local/bin
 
 	# Check versions
 	node -v
