@@ -161,14 +161,33 @@ Install_Certbot() {
 	echo "=> Installed certbot."
 }
 
+# Note: nodesource is used to install node for all users.
+# Ref: https://github.com/nodesource/distributions/blob/master/README.md
+InstallAndSetupNodejs_ViaNodeSource() {
+	printf "Enter node version (current, 16, 18,...): "
+	read node_version
+	printf "Install node ${node_version}? (y/*): "
+	read ans
+	if [[ $ans != "y" ]]; then
+		echo "Aborted"
+		return
+	fi
+
+	curl -fsSL https://deb.nodesource.com/setup_${node_version}.x | sudo -E bash -
+	sudo apt-get install -y nodejs
+
+	# curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
+	# sudo apt-get install -y nodejs
+}
+# Note: nvm is used to install node per user (not for all users)
 # Ref: https://github.com/nvm-sh/nvm#installing-and-updating
-InstallAndSetupNodejs_PreSetup() {
+InstallAndSetupNodejs_ViaNpm_PreSetup() {
 	# Install nvm (node version management)
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
 	echo "[Warn] Please exit terminal and re-enter to continue setup."
 }
-InstallAndSetupNodejs_PostSetup() {
+InstallAndSetupNodejs_ViaNpm_PostSetup() {
 	# Install and Use node with specific version
 	# Note: 18 means we use latest version, for eg,. 18.2.0
 	# After installed, should reload terminal (for eg,. by exit and re-enter to server)
@@ -183,11 +202,9 @@ InstallAndSetupNodejs_PostSetup() {
 	# sudo ln -s "$(which node)" /usr/local/bin/node
 	# sudo ln -s "$(which npm)" /usr/local/bin/npm
 
-	# Copy node, npm to /usr/local/bin
-	sudo cp $(which node) /usr/local/bin
-	sudo cp $(which npm) /usr/local/bin
-
-	# Check versions
+	# Check path and version
+	which node
+	which npm
 	node -v
 	npm -v
 }
