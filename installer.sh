@@ -28,6 +28,26 @@ Install_SqlServer2019() {
 	# Verify that the service is running
 	systemctl status mssql-server --no-pager
 
+	# Install SQL Server (sqlcmd, bcp,...)
+	printf "Install SQL Server tools? (y/*): "
+	read ans
+	if [[ $ans == "y"]]; then
+		sudo apt-get update
+		sudo apt install curl
+		curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+		curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+
+		sudo apt-get update
+		sudo apt-get install mssql-tools unixodbc-dev
+		echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+		source ~/.bashrc
+
+		echo "Installed SQL Server tools (sqlcmd, bcp) !"
+		echo "For update tools, just hit: sudo apt-get update && sudo apt-get install mssql-tools"
+	else
+		echo "Skip install tools !"
+	fi
+
 	echo "=> Installed sql server."
 	echo "To connect remotely, at ec2 instance, let allow firewall at port 1433 (for production, should also restrict incoming ip) as below:"
 	echo "  - Click to target ec2 server to open detail page"
