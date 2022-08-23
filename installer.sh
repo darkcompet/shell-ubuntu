@@ -31,7 +31,7 @@ Install_SqlServer2019() {
 	# Install SQL Server (sqlcmd, bcp,...)
 	printf "Install SQL Server tools? (y/*): "
 	read ans
-	if [[ $ans == "y"]]; then
+	if [[ $ans == "y" ]]; then
 		sudo apt-get update
 		sudo apt install curl
 		curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
