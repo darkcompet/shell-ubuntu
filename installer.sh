@@ -184,9 +184,10 @@ InstallAndSetupNodejs_ViaNodeSource() {
 	# curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
 	# sudo apt-get install -y nodejs
 }
+
 # Note: nvm is used to install node per user (not for all users)
 # Ref: https://github.com/nvm-sh/nvm#installing-and-updating
-InstallAndSetupNodejs_ViaNpm_PreSetup() {
+InstallAndSetupNodejs_ViaNvm_PreSetup() {
 	# Install nvm (node version management)
 	# Need change owner back later at post-phase
 	# sudo mkdir -p /usr/local/nvm
@@ -197,7 +198,7 @@ InstallAndSetupNodejs_ViaNpm_PreSetup() {
 	echo "[Warn] Please run above command to add nvm to bash. Or otherwise, exit terminal and re-enter to continue setup."
 }
 # After installed, should reload terminal (for eg,. source ~/.bashrc, or exit -> re-enter to server)
-InstallAndSetupNodejs_ViaNpm_PostSetup() {
+InstallAndSetupNodejs_ViaNvm_PostSetup() {
 	# Install and Use node with specific version
 	# Note: 18 means we use latest version, for eg,. 18.2.0
 	nvm install $NODE_VERSION
