@@ -133,6 +133,17 @@ Install_Dotnet() {
 
 	echo "=> Installed dotnet."
 }
+Install_Dotnet_ForUbuntu2004() {
+	echo "[Info] Installing dotnet..."
+
+	wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+	sudo dpkg -i packages-microsoft-prod.deb
+	rm packages-microsoft-prod.deb
+
+	sudo apt-get update && sudo apt-get install -y dotnet-sdk-6.0
+
+	echo "=> Installed dotnet."
+}
 
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-22-04
 Install_Certbot() {
