@@ -1,4 +1,8 @@
 
+Update_OS() {
+	sudo apt-get update -y && sudo apt-get upgrade -y
+}
+
 # At this time, MSSQL 2019 does not support for ubuntu 22.04. So we use ubuntu 20.04 instead.
 # Ref: https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-linux-ver15
 Install_SqlServer2019() {
@@ -126,6 +130,13 @@ Install_Nginx() {
 }
 
 # Ref: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
+Cleanup_Dotnet() {
+	sudo apt remove dotnet*
+	sudo apt remove aspnetcore*
+
+	sudo rm /etc/apt/sources.list.d/microsoft-prod.list
+	sudo apt update
+}
 Install_Dotnet() {
 	echo "[Info] Installing dotnet..."
 
