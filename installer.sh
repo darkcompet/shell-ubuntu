@@ -137,14 +137,14 @@ Cleanup_Dotnet() {
 	sudo rm /etc/apt/sources.list.d/microsoft-prod.list
 	sudo apt update
 }
-Install_Dotnet() {
+Install_Dotnet6_ForUbuntu2204() {
 	echo "[Info] Installing dotnet..."
 
 	sudo apt-get update && sudo apt-get install -y dotnet6
 
 	echo "=> Installed dotnet."
 }
-Install_Dotnet_ForUbuntu2004() {
+Install_Dotnet6_ForUbuntu2004() {
 	echo "[Info] Installing dotnet..."
 
 	wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
