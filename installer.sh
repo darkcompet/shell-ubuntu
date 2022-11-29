@@ -133,9 +133,28 @@ Install_Nginx() {
 Cleanup_Dotnet() {
 	sudo apt remove dotnet*
 	sudo apt remove aspnetcore*
+	sudo apt remove netstandard*
+
+	sudo apt-get remove dotnet*
+	sudo apt-get remove aspnetcore*
+
 
 	sudo rm /etc/apt/sources.list.d/microsoft-prod.list
+	sudo rm /etc/apt/sources.list.d/microsoft-prod.list.save
+
+	sudo apt autoremove
 	sudo apt update
+}
+# Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2204-microsoft-package-feed
+Install_Dotnet7_ForUbuntu1804Above() {
+	# Cleanup previous version
+	# Dotnet 7 is NOT included in Ubuntu feed, we have to use Microsoft feed !
+	sudo wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+	sudo dpkg -i packages-microsoft-prod.deb
+	sudo rm packages-microsoft-prod.deb
+
+	# Install full sdk (includes runtime)
+	sudo apt-get update && sudo apt-get install -y dotnet-sdk-7.0
 }
 Install_Dotnet6_ForUbuntu2204() {
 	echo "[Info] Installing dotnet..."
