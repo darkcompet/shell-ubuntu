@@ -93,7 +93,7 @@ __MySQL_Manual_Config() {
 	# [Option 2] For test purpose, use id/pwd so client can connect to db, but it is less security than authentication_plugin.
 	mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED BY 'Test1234!';
 	# mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-	mysql> GRANT ALL ON phongthuydainam.* TO 'darkcompet'@'localhost';
+	mysql> GRANT ALL ON gpscompass.* TO 'darkcompet'@'localhost';
 	mysql> FLUSH PRIVILEGES;
 	mysql> \q
 
