@@ -74,7 +74,7 @@ Install_MySQL() {
 }
 # Caller should follow it after installed MySQL.
 __MySQL_Manual_Config() {
-	# [Run mysql_secure_installation script]
+	# Step 1. Use root native password to setup.
 	# We need root priviledge to run mysql_secure_installation script.
 	# Since by default MySQL 8.0 uses auth_socket for authentication,
 	# so we will adjust to authenticate with id/pwd instead, then revert after done.
@@ -82,28 +82,49 @@ __MySQL_Manual_Config() {
 	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root1234!';
 	mysql> \q
 
-	# Run secure script with root previledge (enter root password if be asked).
+	# Step 2. Run secure script with root previledge (enter root password if be asked).
 	# Yes all for more secure.
 	sudo mysql_secure_installation
 
-	# Create our account
+	# Step 3. Create user account
 	sudo mysql -u root -p
+
 	# [Option 1] Use authentication_plugin will prevent remote-connection, so client cannot interact with db.
-	# mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED WITH authentication_plugin BY 'password';
+	# mysql> CREATE USER 'mydb_user'@'localhost' IDENTIFIED WITH authentication_plugin BY 'password';
+
 	# [Option 2] For test purpose, use id/pwd so client can connect to db, but it is less security than authentication_plugin.
-	mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED BY 'Test1234!';
-	# mysql> CREATE USER 'darkcompet'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-	mysql> GRANT ALL ON gpscompass.* TO 'darkcompet'@'localhost';
+	# Use `localhost` or remote ip (for eg,. %, 212.123.99.182,...)
+	mysql> CREATE USER 'mydb_user'@'%' IDENTIFIED BY 'Test1234!';
+
+	# Create new user
+	mysql> CREATE USER 'mydb_user'@'%' IDENTIFIED BY 'Test1234!';
+	CREATE USER 'casino_user'@'%' IDENTIFIED BY 'Staging1234!';
+
+	# [Optional] For rename existed user
+	mysql> RENAME USER 'mydb_user'@'%' TO 'mydb_user'@'%';
+
+	# [Optional] For drop the user
+	mysql> DROP USER 'mydb_user'@'%';
+
+	# mysql> CREATE USER 'mydb_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+	mysql> GRANT ALL ON mydb.* TO 'mydb_user'@'%';
 	mysql> FLUSH PRIVILEGES;
 	mysql> \q
 
-	# Rever root authentication to auth_socket
+	# Step 4. Revert root authentication to auth_socket
 	mysql -u root -p
 	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
 	mysql> \q
 	# Now, we can once again connect to MySQL as your root user using the [sudo mysql] command.
 
-	# Check service status
+	# Allow access from the connection (or anywhere)
+	sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+	# Uncomment bind address
+	bind-address = 0.0.0.0
+	# Finally, restart mysql server
+	sudo systemctl restart mysql
+
+	# Step 5. Check service status
 	systemctl status mysql.service
 	echo "[Note] If service is not started, go with: sudo systemctl start mysql"
 }
