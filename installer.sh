@@ -119,8 +119,9 @@ __MySQL_Manual_Config() {
 
 	# Allow access from the connection (or anywhere)
 	sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
-	# Uncomment bind address
-	bind-address = 0.0.0.0
+	# Uncomment 2 lines
+	bind-address = 127.0.0.1
+	mysqlx-bind-address = 127.0.0.1
 	# Finally, restart mysql server
 	sudo systemctl restart mysql
 
