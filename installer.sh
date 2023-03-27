@@ -70,7 +70,7 @@ Install_MySQL() {
 	# Start service
 	sudo systemctl start mysql.service
 
-	echo "[Warn] Please continue with manual configure MySQL"
+	echo "[Warn] Please continue with manual configuration at `__MySQL_Manual_Config`"
 }
 # Caller should follow it after installed MySQL.
 __MySQL_Manual_Config() {
