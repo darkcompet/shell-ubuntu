@@ -229,6 +229,9 @@ InstallAndSetupNodejs_ViaNodeSource() {
 # Note: nvm is used to install node per user (not for all users)
 # Ref: https://github.com/nvm-sh/nvm#installing-and-updating
 InstallAndSetupNodejs_ViaNvm_PreSetup() {
+	# Should use `curl` of ubuntu
+	echo "If curl is not installed, pls install with: sudo apt install curl"
+
 	# Install nvm (node version management)
 	# Need change owner back later at post-phase
 	# sudo mkdir -p /usr/local/nvm
