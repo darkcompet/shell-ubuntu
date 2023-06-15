@@ -164,6 +164,11 @@ Cleanup_Dotnet() {
 	sudo apt update
 }
 # Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2204-microsoft-package-feed
+Install_Dotnet7_ForUbuntu2204Above() {
+	# Just install from Ubuntu repo to avoid multiple installation sources
+	sudo apt-get update && sudo apt-get install -y dotnet-sdk-7.0
+}
+# Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2204-microsoft-package-feed
 Install_Dotnet7_ForUbuntu1804Above() {
 	# Cleanup previous version
 	# Dotnet 7 is NOT included in Ubuntu feed, we have to use Microsoft feed !
