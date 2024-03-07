@@ -163,6 +163,10 @@ Cleanup_Dotnet() {
 	sudo apt autoremove
 	sudo apt update
 }
+# Ref: xxx
+Install_Dotnet8_ForUbuntu2204Above() {
+	sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0
+}
 # Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2204-microsoft-package-feed
 Install_Dotnet7_ForUbuntu2204Above() {
 	# Just install from Ubuntu repo to avoid multiple installation sources
