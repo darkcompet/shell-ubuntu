@@ -193,7 +193,7 @@ Install_Nginx() {
 }
 
 # Ref: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
-Cleanup_Dotnet() {
+Dotnet_Cleanup() {
 	sudo apt remove dotnet*
 	sudo apt remove aspnetcore*
 	sudo apt remove netstandard*
