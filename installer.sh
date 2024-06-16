@@ -94,7 +94,7 @@ __MySQL_Manual_Config() {
 
 	# [Option 2] For test purpose, use id/pwd so client can connect to db, but it is less security than authentication_plugin.
 	# Use `localhost` or remote ip (for eg,. %, 212.123.99.182,...)
-	mysql> CREATE USER 'casino_user'@'%' IDENTIFIED BY 'Staging1234!';
+	mysql> CREATE USER 'mydb_user'@'%' IDENTIFIED BY 'Staging1234!';
 
 	# [Optional] For rename existed user
 	mysql> RENAME USER 'mydb_user'@'%' TO 'mydb_user'@'%';
@@ -113,7 +113,7 @@ __MySQL_Manual_Config() {
 	mysql> \q
 	# Now, we can once again connect to MySQL as your root user using the [sudo mysql] command.
 
-	# Allow access from the connection (or anywhere)
+	# Allow access from remote connection (or outside network)
 	sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 	# Uncomment 2 lines
 	bind-address = 127.0.0.1
