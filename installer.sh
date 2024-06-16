@@ -3,6 +3,51 @@ Update_OS() {
 	sudo apt-get update -y && sudo apt-get upgrade -y
 }
 
+# Ref: https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-ver16&tabs=ubuntu2204
+Install_SqlServer2022() {
+	# curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+	curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+	curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/mssql-server-2022.list | sudo tee /etc/apt/sources.list.d/mssql-server-2022.list
+
+	# Run the following commands to install SQL Server
+	sudo apt-get update
+	sudo apt-get install -y mssql-server
+
+	# Set the SA password and choose your edition
+	# For eg,. at staging: sa/Staging1234!
+	sudo /opt/mssql/bin/mssql-conf setup
+
+	# Verify that the service is running
+	systemctl status mssql-server --no-pager
+
+	# Install SQL Server (sqlcmd, bcp,...)
+	printf "Install SQL Server tools? (y/*): "
+	read ans
+	if [[ $ans == "y" ]]; then
+		sudo apt-get update
+		sudo apt install curl
+		curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+		curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+
+		sudo apt-get update
+		sudo apt-get install mssql-tools18 unixodbc-dev
+		echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bash_profile
+		echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+		source ~/.bashrc
+
+		echo "Installed SQL Server tools (sqlcmd, bcp) !"
+		echo "For update tools, just hit: sudo apt-get update && sudo apt-get install mssql-tools"
+	else
+		echo "Skip install tools !"
+	fi
+
+	echo "=> Installed sql server."
+	echo "To connect remotely, at ec2 instance, let allow firewall at port 1433 (for production, should also restrict incoming ip) as below:"
+	echo "  - Click to target ec2 server to open detail page"
+	echo "  - Select tab Security -> Click Security groups -> Click Edit inbound rules"
+	echo "  - Add TCP 1433 with source 0.0.0.0/0"
+}
+
 # At this time, MSSQL 2019 does not support for ubuntu 22.04. So we use ubuntu 20.04 instead.
 # Ref: https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-linux-ver15
 Install_SqlServer2019() {
@@ -148,7 +193,7 @@ Install_Nginx() {
 }
 
 # Ref: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
-Cleanup_Dotnet() {
+Dotnet_Cleanup() {
 	sudo apt remove dotnet*
 	sudo apt remove aspnetcore*
 	sudo apt remove netstandard*
@@ -162,6 +207,10 @@ Cleanup_Dotnet() {
 
 	sudo apt autoremove
 	sudo apt update
+}
+# Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2204
+Install_Dotnet8_ForUbuntu2204Above() {
+	sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0
 }
 # Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2204-microsoft-package-feed
 Install_Dotnet7_ForUbuntu2204Above() {
