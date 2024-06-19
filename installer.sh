@@ -139,16 +139,16 @@ __MySQL_Manual_Config() {
 
 	# [Option 2] For test purpose, use id/pwd so client can connect to db, but it is less security than authentication_plugin.
 	# Use `localhost` or remote ip (for eg,. %, 212.123.99.182,...)
-	mysql> CREATE USER 'casino_user'@'%' IDENTIFIED BY 'Staging1234!';
+	mysql> CREATE USER 'mydb_user'@'%' IDENTIFIED BY 'Staging1234!';
 
 	# [Optional] For rename existed user
-	mysql> RENAME USER 'mydb_user'@'%' TO 'mydb_user'@'%';
+	mysql> RENAME USER 'mydb_user'@'%' TO 'ncp_user'@'%';
 
 	# [Optional] For drop the user
-	mysql> DROP USER 'mydb_user'@'%';
+	mysql> DROP USER 'ncp_user'@'%';
 
-	# mysql> CREATE USER 'mydb_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-	mysql> GRANT ALL ON mydb.* TO 'mydb_user'@'%';
+	# mysql> CREATE USER 'ncp_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+	mysql> GRANT ALL ON ncp_mysql.* TO 'ncp_user'@'%';
 	mysql> FLUSH PRIVILEGES;
 	mysql> \q
 
