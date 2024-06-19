@@ -158,7 +158,7 @@ __MySQL_Manual_Config() {
 	mysql> \q
 	# Now, we can once again connect to MySQL as your root user using the [sudo mysql] command.
 
-	# Allow access from the connection (or anywhere)
+	# Allow access from remote connection (or outside network)
 	sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 	# Uncomment 2 lines
 	bind-address = 127.0.0.1
