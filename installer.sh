@@ -131,7 +131,7 @@ __MySQL_Manual_Config() {
 	# Yes all for more secure.
 	sudo mysql_secure_installation
 
-	# Step 3. Create user account
+	# Step 3. CRUD user account
 	sudo mysql -u root -p
 
 	# [Option 1] Use authentication_plugin will prevent remote-connection, so client cannot interact with db.
@@ -141,18 +141,19 @@ __MySQL_Manual_Config() {
 	# Use `localhost` or remote ip (for eg,. %, 212.123.99.182,...)
 	mysql> CREATE USER 'mydb_user'@'%' IDENTIFIED BY 'Staging1234!';
 
-	# [Optional] For rename existed user
+	# [Option 3] For rename existed user
 	mysql> RENAME USER 'mydb_user'@'%' TO 'ncp_user'@'%';
 
-	# [Optional] For drop the user
+	# [Option 4] For drop the user
 	mysql> DROP USER 'ncp_user'@'%';
 
+	# Step 4. Grant access to db for the user
 	# mysql> CREATE USER 'ncp_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
 	mysql> GRANT ALL ON ncp_mysql.* TO 'ncp_user'@'%';
 	mysql> FLUSH PRIVILEGES;
 	mysql> \q
 
-	# Step 4. Revert root authentication to auth_socket
+	# Step 5. Revert root authentication to auth_socket
 	mysql -u root -p
 	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
 	mysql> \q
@@ -166,7 +167,7 @@ __MySQL_Manual_Config() {
 	# Finally, restart mysql server
 	sudo systemctl restart mysql
 
-	# Step 5. Check service status
+	# Step 6. Check service status
 	systemctl status mysql.service
 	echo "[Note] If service is not started, go with: sudo systemctl start mysql"
 }
