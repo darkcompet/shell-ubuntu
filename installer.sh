@@ -248,6 +248,31 @@ Install_Dotnet6_ForUbuntu2004() {
 	echo "=> Installed dotnet."
 }
 
+ConfigSSH() {
+	$RAW_URL=$1
+
+	echo "Complete below settings:"
+	echo "1. Domain is pointing to server"
+	echo "- Domain xxx.abc.com and www.xxx.abc.com are pointing to the server public IP address??"
+	echo "2. Enable firewall for http, https"
+	echo "- If you are on aws ec2, then allow ports 80, 443 to the server by edit inbounds rules."
+	echo "- If you are on ubuntu machine, then run: sudo ufw allow http & sudo ufw allow https"
+	printf "Press y to continue? (y/*): "
+	read ans
+	if [[ $ans != "y" ]]; then
+		echo "Aborted"
+		return
+	fi
+
+	Install_Certbot
+
+	# Obtain ssh cert and Reload nginx
+	sudo certbot --nginx -d ${RAW_URL} -d www.${RAW_URL}
+	sudo service nginx reload
+
+	echo "=> Done config SSH."
+}
+
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-22-04
 Install_Certbot() {
 	echo "[Info] Installing certbot..."
