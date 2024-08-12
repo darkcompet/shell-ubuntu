@@ -248,6 +248,15 @@ Install_Dotnet6_ForUbuntu2004() {
 	echo "=> Installed dotnet."
 }
 
+Install_RedisServer() {
+	sudo apt update
+	sudo apt install redis-server
+}
+Uninstall_RedisServer() {
+	# If you use apt-get to install redis then use
+	sudo apt-get purge --auto-remove redis-server
+}
+
 ConfigSSH() {
 	$RAW_URL=$1
 
