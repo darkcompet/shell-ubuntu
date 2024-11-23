@@ -258,7 +258,7 @@ Uninstall_RedisServer() {
 }
 
 ConfigSSH() {
-	$RAW_URL=$1
+	$DOMAIN_NAME=$1
 
 	echo "Complete below settings:"
 	echo "1. Domain is pointing to server"
@@ -276,7 +276,7 @@ ConfigSSH() {
 	Install_Certbot
 
 	# Obtain ssh cert and Reload nginx
-	sudo certbot --nginx -d ${RAW_URL} -d www.${RAW_URL}
+	sudo certbot --nginx -d ${DOMAIN_NAME} -d www.${DOMAIN_NAME}
 	sudo service nginx reload
 
 	echo "=> Done config SSH."
