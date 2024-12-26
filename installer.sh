@@ -348,6 +348,10 @@ InstallAndSetupNodejs_ViaNvm_PreSetup() {
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 
 	echo "[Warn] Please run above command to add nvm to bash. Or otherwise, exit terminal and re-enter to continue setup."
+	echo "And add below command to ~/.bash_profile to ensure ~/.bashrc is loaded well"
+	echo "if [ -f "$HOME/.bashrc" ]; then"
+	echo "	. "$HOME/.bashrc""
+	ehoc "fi"
 }
 # After installed, should reload terminal (for eg,. source ~/.bashrc, or exit -> re-enter to server)
 InstallAndSetupNodejs_ViaNvm_PostSetup() {
