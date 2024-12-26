@@ -344,7 +344,8 @@ InstallAndSetupNodejs_ViaNvm_PreSetup() {
 	# sudo mkdir -p /usr/local/nvm
 	# sudo chown $USER:$USER /usr/local/nvm
 	# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | NVM_DIR=/usr/local/nvm bash
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+	# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 
 	echo "[Warn] Please run above command to add nvm to bash. Or otherwise, exit terminal and re-enter to continue setup."
 }
