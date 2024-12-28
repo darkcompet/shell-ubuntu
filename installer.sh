@@ -351,7 +351,7 @@ InstallAndSetupNodejs_ViaNvm_PreSetup() {
 	echo "And add below command to ~/.bash_profile to ensure ~/.bashrc is loaded well"
 	echo "if [ -f "$HOME/.bashrc" ]; then"
 	echo "	. "$HOME/.bashrc""
-	ehoc "fi"
+	echo "fi"
 }
 # After installed, should reload terminal (for eg,. source ~/.bashrc, or exit -> re-enter to server)
 InstallAndSetupNodejs_ViaNvm_PostSetup() {
