@@ -2,8 +2,8 @@
 # Run before setup each project
 #----------------------------------------------------------------------------------------------------------------------#
 
-# Import functions from core
-source ../tool/compet/shell-ubuntu/installer.sh
+# Each project must import functions from core in advance !
+# source ../tool/compet/shell-ubuntu/installer.sh
 
 #----------------------------------------------------------------------------------------------------------------------#
 # Utility functions for each project
