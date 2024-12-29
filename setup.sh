@@ -149,6 +149,10 @@ _ConfigSSH() {
 	echo "- Domain xxx.abc.com and www.xxx.abc.com are pointing to the server public IP address??"
 	echo "2. Enable firewall at ec2"
 	echo "- Allow ports 80, 443 to the server by edit inbounds rules."
+	echo "3. Enable firewall at remote server"
+	echo "- Allow ports 80, 443 to the server by hit below commands:"
+	echo "	sudo ufw allow http"
+	echo "	sudo ufw allow https"
 	printf "Press y to continue? (y/*): "
 	read ans
 	if [[ $ans != "y" ]]; then
