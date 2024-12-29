@@ -60,6 +60,7 @@ _CreateNodejsProject() {
 	cd ${ROOT_DIR_PATH}/${PROJ_ACTUAL_FOLDER_NAME}
 	git checkout ${BRANCH}
 	cp .env.${BRANCH} .env
+	nvm use ${NODE_VERSION}
 	npm install
 
 	# Move convenience files to local folder
