@@ -357,18 +357,20 @@ InstallAndSetupNodejs_ViaNvm_PreSetup() {
 InstallAndSetupNodejs_ViaNvm_PostSetup() {
 	# Install and Use node with specific version
 	# Note: 18 means we use latest version, for eg,. 18.2.0
-	nvm install $NODE_VERSION
+	nvm install ${NODE_VERSION}
 
 	# Switch nodejs version, just use
-	nvm use $NODE_VERSION
+	nvm use ${NODE_VERSION}
 
 	# Make nodejs available for all users by create symbol link at /usr/local/bin to our installed node, npm
 	# Before it, we need change back owner to root so other users can use node, npm
 	# sudo chown root:root /usr/local/nvm
 	sudo unlink /usr/local/bin/node
 	sudo unlink /usr/local/bin/npm
+	sudo unlink /usr/local/bin/npx
 	sudo ln -s "$(which node)" /usr/local/bin/node
 	sudo ln -s "$(which npm)" /usr/local/bin/npm
+	sudo ln -s "$(which npx)" /usr/local/bin/npx
 
 	# Check path and version
 	ll /usr/local/bin/node
