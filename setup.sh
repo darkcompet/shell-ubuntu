@@ -40,7 +40,6 @@ _CreateAspProject() {
 	# Setup env
 	cd ${ROOT_DIR_PATH}/${PROJ_ACTUAL_FOLDER_NAME}
 	git checkout ${BRANCH}
-	cp Properties/launchSettings.${BRANCH} Properties/launchSettings.json
 	cp appsettings.${BRANCH} appsettings.json
 
 	# Move convenience files to local folder
