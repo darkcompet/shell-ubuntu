@@ -209,6 +209,10 @@ Dotnet_Cleanup() {
 	sudo apt autoremove
 	sudo apt update
 }
+Install_Dotnet9_ForUbuntu2204() {
+	sudo add-apt-repository ppa:dotnet/backports
+	sudo apt-get update && sudo apt-get install -y dotnet-sdk-9.0
+}
 # Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2204
 Install_Dotnet8_ForUbuntu2204Above() {
 	sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0
