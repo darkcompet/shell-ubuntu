@@ -115,61 +115,11 @@ Install_MySQL() {
 	# Start service
 	sudo systemctl start mysql.service
 
-	echo "[Warn] Please continue with manual configuration at `__MySQL_Manual_Config`"
-}
-# Caller should follow it after installed MySQL.
-__MySQL_Manual_Config() {
-	# Step 1. Use root native password to setup.
-	# We need root priviledge to run mysql_secure_installation script.
-	# Since by default MySQL 8.0 uses auth_socket for authentication,
-	# so we will adjust to authenticate with id/pwd instead, then revert after done.
-	sudo mysql
-	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root1234!';
-	mysql> \q
-
-	# Step 2. Run secure script with root previledge (enter root password if be asked).
-	# Yes all for more secure.
+	# Run secure script with root previledge
+	echo "OK, please continue to secure installation"
 	sudo mysql_secure_installation
 
-	# Step 3. CRUD user account
-	sudo mysql -u root -p
-
-	# [Option 1] Use authentication_plugin will prevent remote-connection, so client cannot interact with db.
-	# mysql> CREATE USER 'mydb_user'@'localhost' IDENTIFIED WITH authentication_plugin BY 'password';
-
-	# [Option 2] For test purpose, use id/pwd so client can connect to db, but it is less security than authentication_plugin.
-	# Use `localhost` or remote ip (for eg,. %, 212.123.99.182,...)
-	mysql> CREATE USER 'mydb_user'@'%' IDENTIFIED BY 'Staging1234!';
-
-	# [Option 3] For rename existed user
-	mysql> RENAME USER 'mydb_user'@'%' TO 'ncp_user'@'%';
-
-	# [Option 4] For drop the user
-	mysql> DROP USER 'ncp_user'@'%';
-
-	# Step 4. Grant access to db for the user
-	# mysql> CREATE USER 'ncp_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-	mysql> GRANT ALL ON ncp_mysql.* TO 'ncp_user'@'%';
-	mysql> FLUSH PRIVILEGES;
-	mysql> \q
-
-	# Step 5. Revert root authentication to auth_socket
-	mysql -u root -p
-	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
-	mysql> \q
-	# Now, we can once again connect to MySQL as your root user using the [sudo mysql] command.
-
-	# Allow access from remote connection (or outside network)
-	sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
-	# Uncomment 2 lines
-	bind-address = 127.0.0.1
-	mysqlx-bind-address = 127.0.0.1
-	# Finally, restart mysql server
-	sudo systemctl restart mysql
-
-	# Step 6. Check service status
-	systemctl status mysql.service
-	echo "[Note] If service is not started, go with: sudo systemctl start mysql"
+	echo "Done !"
 }
 
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
