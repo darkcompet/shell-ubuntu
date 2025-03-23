@@ -122,6 +122,19 @@ Install_MySQL() {
 	echo "Done !"
 }
 
+Install_PostgreSQL() {
+	# Update OS and install postgresql
+	sudo apt update && sudo apt upgrade -y
+	sudo apt install postgresql postgresql-contrib -y
+
+	# Start service and register start at boot time
+	sudo systemctl start postgresql
+	sudo systemctl enable postgresql
+
+	sudo systemctl status postgresql
+	echo "Done !"
+}
+
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
 Install_Nginx() {
 	echo "[Info] Installing nginx..."
