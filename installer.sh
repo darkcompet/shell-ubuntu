@@ -224,7 +224,7 @@ Uninstall_RedisServer() {
 	sudo apt-get purge --auto-remove redis-server
 }
 
-ConfigSSH() {
+ConfigSSL() {
 	$DOMAIN_NAME=$1
 
 	echo "Complete below settings:"
@@ -243,7 +243,11 @@ ConfigSSH() {
 	Install_Certbot
 
 	# Obtain ssh cert and Reload nginx
-	sudo certbot --nginx -d ${DOMAIN_NAME} -d www.${DOMAIN_NAME}
+	for domain in $DOMAIN_NAME; do
+		echo "Processing SSL for $domain"
+		certbot --nginx -d "$domain" -d "www.$domain" --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
+	done
+
 	sudo service nginx reload
 
 	echo "=> Done config SSH."

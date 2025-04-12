@@ -143,7 +143,7 @@ _CreateServiceForProject() {
 	cd ${CONFIG_PROJ_ROOT_DIR_PATH}
 }
 
-_ConfigSSH() {
+_ConfigSSL() {
 	echo "Complete below settings:"
 	echo "1. Domain is pointing to server"
 	echo "- Domain xxx.abc.com and www.xxx.abc.com are pointing to the server public IP address??"
