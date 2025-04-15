@@ -240,11 +240,14 @@ ConfigSSL() {
 
 	Install_Certbot
 
-	# Obtain ssh cert and Reload nginx
+	# Build domain list with both root and www for each domain
+	DOMAINS=""
 	for domain in $DOMAIN_NAME; do
-		echo "Processing SSL for $domain"
-		certbot --nginx -d "$domain" -d "www.$domain" --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
+		DOMAINS="$DOMAINS -d $domain -d www.$domain"
 	done
+
+	# Now run certbot once with all domains
+	sudo certbot --nginx $DOMAINS --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
 
 	sudo service nginx reload
 
