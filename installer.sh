@@ -225,8 +225,6 @@ Uninstall_RedisServer() {
 }
 
 ConfigSSL() {
-	$DOMAIN_NAME=$1
-
 	echo "Complete below settings:"
 	echo "1. Domain is pointing to server"
 	echo "- Domain xxx.abc.com and www.xxx.abc.com are pointing to the server public IP address??"
