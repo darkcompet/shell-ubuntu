@@ -147,12 +147,9 @@ _ConfigSSL() {
 	echo "Complete below settings:"
 	echo "1. Domain is pointing to server"
 	echo "- Domain xxx.abc.com and www.xxx.abc.com are pointing to the server public IP address??"
-	echo "2. Enable firewall at ec2"
-	echo "- Allow ports 80, 443 to the server by edit inbounds rules."
-	echo "3. Enable firewall at remote server"
-	echo "- Allow ports 80, 443 to the server by hit below commands:"
-	echo "	sudo ufw allow http"
-	echo "	sudo ufw allow https"
+	echo "2. Enable firewall for http, https"
+	echo "- If you are on aws ec2, then allow ports 80, 443 to the server by edit inbounds rules."
+	echo "- If you are on ubuntu machine, then run: sudo ufw allow http & sudo ufw allow https"
 	printf "Press y to continue? (y/*): "
 	read ans
 	if [[ $ans != "y" ]]; then
@@ -162,13 +159,18 @@ _ConfigSSL() {
 
 	Install_Certbot
 
-	# Obtain ssh cert and Reload nginx
-	sudo certbot --nginx -d ${DOMAIN_NAME} -d www.${DOMAIN_NAME}
+	# Build domain list with both root and www for each domain
+	DOMAINS=""
+	for domain in $DOMAIN_NAME; do
+		DOMAINS="$DOMAINS -d $domain -d www.$domain"
+	done
+
+	# Now run certbot once with all domains
+	sudo certbot --nginx $DOMAINS --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
+
 	sudo service nginx reload
 
 	echo "=> Done config SSH."
-
-	cd ${CONFIG_PROJ_ROOT_DIR_PATH}
 }
 
 _CompleteSetupForAspProject() {
