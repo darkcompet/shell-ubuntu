@@ -224,33 +224,6 @@ Uninstall_RedisServer() {
 	sudo apt-get purge --auto-remove redis-server
 }
 
-ConfigSSL() {
-	echo "Complete below settings:"
-	echo "1. Domain is pointing to server"
-	echo "- Domain xxx.abc.com and www.xxx.abc.com are pointing to the server public IP address??"
-	echo "2. Enable firewall for http, https"
-	echo "- If you are on aws ec2, then allow ports 80, 443 to the server by edit inbounds rules."
-	echo "- If you are on ubuntu machine, then run: sudo ufw allow http & sudo ufw allow https"
-	printf "Press y to continue? (y/*): "
-	read ans
-	if [[ $ans != "y" ]]; then
-		echo "Aborted"
-		return
-	fi
-
-	Install_Certbot
-
-	# Obtain ssh cert and Reload nginx
-	for domain in $DOMAIN_NAME; do
-		echo "Processing SSL for $domain"
-		certbot --nginx -d "$domain" -d "www.$domain" --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
-	done
-
-	sudo service nginx reload
-
-	echo "=> Done config SSH."
-}
-
 # Ref: https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-22-04
 Install_Certbot() {
 	echo "[Info] Installing certbot..."
