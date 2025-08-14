@@ -135,8 +135,40 @@ Install_PostgreSQL() {
 	echo "Done !"
 }
 
-# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
+# Remove current nginx
+Uninstall_Nginx() {
+	sudo systemctl stop nginx
+	sudo apt remove --purge nginx nginx-common
+	sudo apt autoremove
+}
+
+# Install latest official package
 Install_Nginx() {
+	# Add the official Nginx signing key
+	curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+
+	# Add the official Nginx repository (main branch)
+	echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
+http://nginx.org/packages/mainline/ubuntu $(lsb_release -cs) nginx" | \
+	sudo tee /etc/apt/sources.list.d/nginx.list
+
+	sudo apt update
+	sudo apt install nginx
+
+	sudo systemctl enable nginx
+	sudo systemctl start nginx
+	sudo service nginx status
+	nginx -v
+
+	echo "=> Installed nginx."
+	echo "Please allow firewall at port 80, 443 (for production, should also restrict incoming ip), for eg,. at ec2:"
+	echo "  - Click to target ec2 server to open detail page"
+	echo "  - Select tab Security -> Click Security groups -> Click Edit inbound rules"
+	echo "  - Add TCP 80, 443 with source 0.0.0.0/0"
+}
+
+# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
+Install_Nginx_ViaUbuntuPackage() {
 	echo "[Info] Installing nginx..."
 
 	# After, ssh to server,
