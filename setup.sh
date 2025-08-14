@@ -157,8 +157,6 @@ _ConfigSSL() {
 		return
 	fi
 
-	Install_Certbot
-
 	# Build domain list with both root and www for each domain
 	DOMAINS=""
 	for domain in $DOMAIN_NAME; do
