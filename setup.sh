@@ -164,7 +164,7 @@ _ConfigSSL() {
 	done
 
 	# Now run certbot once with all domains
-	sudo certbot certonly --webroot -w /var/www/certbot $DOMAINS --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
+	sudo certbot certonly --webroot -w /var/www/certbot $DOMAINS --force-renewal --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
 
 	# Test config
 	sudo nginx -t
