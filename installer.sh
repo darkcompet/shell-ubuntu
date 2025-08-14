@@ -270,6 +270,9 @@ Install_Certbot() {
 	sudo snap install --classic certbot
 	sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
+	# Create hook (auto-reload nginx) when certbot renew certs
+	sudo certbot renew --deploy-hook "sudo systemctl reload nginx"
+
 	# Check grammar
 	sudo nginx -t
 
