@@ -102,14 +102,14 @@ _CreateLaravelProject() {
 
 _ConfigNginxForProject() {
 	# Remove default config
-	sudo rm /etc/nginx/sites-available/default
-	sudo rm /etc/nginx/sites-enabled/default
+	# sudo rm /etc/nginx/conf.d/default
+	# sudo rm /etc/nginx/sites-enabled/default
 
 	# Create nginx config file
-	sudo cp ${CONFIG_PROJ_ROOT_DIR_PATH}/data/config/${NGINX_CONFIG_FILE_NAME}.config /etc/nginx/sites-available/
+	sudo cp ${CONFIG_PROJ_ROOT_DIR_PATH}/data/config/${NGINX_CONFIG_FILE_NAME}.config /etc/nginx/conf.d/
 
 	# Enable our site
-	sudo ln -s /etc/nginx/sites-available/${NGINX_CONFIG_FILE_NAME}.config /etc/nginx/sites-enabled/
+	# sudo ln -s /etc/nginx/conf.d/${NGINX_CONFIG_FILE_NAME}.config /etc/nginx/sites-enabled/
 
 	# Validate config grammar
 	sudo nginx -t
