@@ -106,10 +106,10 @@ _ConfigNginxForProject() {
 	# sudo rm /etc/nginx/sites-enabled/default
 
 	# Create nginx config file
-	sudo cp ${CONFIG_PROJ_ROOT_DIR_PATH}/data/config/${NGINX_CONFIG_FILE_NAME}.config /etc/nginx/conf.d/
+	sudo cp ${CONFIG_PROJ_ROOT_DIR_PATH}/data/config/${NGINX_CONFIG_FILE_NAME}.conf /etc/nginx/conf.d/
 
 	# Enable our site
-	# sudo ln -s /etc/nginx/conf.d/${NGINX_CONFIG_FILE_NAME}.config /etc/nginx/sites-enabled/
+	# sudo ln -s /etc/nginx/conf.d/${NGINX_CONFIG_FILE_NAME}.conf /etc/nginx/sites-enabled/
 
 	# Validate config grammar
 	sudo nginx -t
