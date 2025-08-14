@@ -260,6 +260,9 @@ Uninstall_RedisServer() {
 Install_Certbot() {
 	echo "[Info] Installing certbot..."
 
+	sudo mkdir -p /var/www/certbot
+	sudo chown -R www-data:www-data /var/www/certbot
+
 	# Install certbot
 	# For uninstall: sudo apt remove certbot
 	sudo snap install core

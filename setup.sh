@@ -166,9 +166,14 @@ _ConfigSSL() {
 	done
 
 	# Now run certbot once with all domains
-	sudo certbot --nginx $DOMAINS --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
+	sudo certbot certonly --webroot -w /var/www/certbot $DOMAINS --non-interactive --agree-tos -m $YOUR_CONTACT_EMAIL
 
+	# Test config
+	sudo nginx -t
 	sudo service nginx reload
+
+	# Test auto-renewal
+	# sudo certbot renew --dry-run
 
 	echo "=> Done config SSH."
 }
