@@ -3,6 +3,24 @@ Update_OS() {
 	sudo apt-get update -y && sudo apt-get upgrade -y
 }
 
+Install_Git() {
+	# Update packages
+	sudo apt update
+	sudo apt install -y software-properties-common
+
+	# Add the official Git PPA
+	sudo add-apt-repository ppa:git-core/ppa -y
+
+	# Update again
+	sudo apt update
+
+	# Install latest Git
+	sudo apt install -y git
+
+	# Verify version
+	git --version
+}
+
 # Ref: https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-ver16&tabs=ubuntu2204
 Install_SqlServer2022() {
 	# curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
@@ -142,7 +160,7 @@ Uninstall_Nginx() {
 	sudo apt autoremove
 }
 
-# Install latest official package
+# Install latest official mainline package (user will be nginx)
 Install_Nginx() {
 	# Add the official Nginx signing key
 	curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
@@ -167,8 +185,8 @@ http://nginx.org/packages/mainline/ubuntu $(lsb_release -cs) nginx" | \
 	echo "  - Add TCP 80, 443 with source 0.0.0.0/0"
 }
 
-# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
-Install_Nginx_ViaUbuntuPackage() {
+# Install nginx at Ubuntu repo (user will be www-data)
+Install_Nginx_AtUbuntuRepo() {
 	echo "[Info] Installing nginx..."
 
 	# After, ssh to server,
@@ -189,7 +207,7 @@ Install_Nginx_ViaUbuntuPackage() {
 }
 
 # Ref: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
-Dotnet_Cleanup() {
+Remove_Dotnet() {
 	sudo apt remove dotnet*
 	sudo apt remove aspnetcore*
 	sudo apt remove netstandard*
@@ -204,19 +222,23 @@ Dotnet_Cleanup() {
 	sudo apt autoremove
 	sudo apt update
 }
+
 Install_Dotnet9_ForUbuntu2204() {
 	sudo add-apt-repository ppa:dotnet/backports
 	sudo apt-get update && sudo apt-get install -y dotnet-sdk-9.0
 }
+
 # Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2204
 Install_Dotnet8_ForUbuntu2204Above() {
 	sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0
 }
+
 # Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2204-microsoft-package-feed
 Install_Dotnet7_ForUbuntu2204Above() {
 	# Just install from Ubuntu repo to avoid multiple installation sources
 	sudo apt-get update && sudo apt-get install -y dotnet-sdk-7.0
 }
+
 # Ref: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2204-microsoft-package-feed
 Install_Dotnet7_ForUbuntu1804Above() {
 	# Cleanup previous version
@@ -228,6 +250,7 @@ Install_Dotnet7_ForUbuntu1804Above() {
 	# Install full sdk (includes runtime)
 	sudo apt-get update && sudo apt-get install -y dotnet-sdk-7.0
 }
+
 Install_Dotnet6_ForUbuntu2204() {
 	echo "[Info] Installing dotnet..."
 
@@ -235,6 +258,7 @@ Install_Dotnet6_ForUbuntu2204() {
 
 	echo "=> Installed dotnet."
 }
+
 Install_Dotnet6_ForUbuntu2004() {
 	echo "[Info] Installing dotnet..."
 
@@ -251,17 +275,17 @@ Install_RedisServer() {
 	sudo apt update
 	sudo apt install redis-server
 }
+
 Uninstall_RedisServer() {
-	# If you use apt-get to install redis then use
 	sudo apt-get purge --auto-remove redis-server
 }
 
-# Ref: https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-22-04
+# Install certbot (nginx version)
 Install_Certbot() {
 	echo "[Info] Installing certbot..."
 
-	sudo mkdir -p /var/www/certbot
-	sudo chown -R www-data:www-data /var/www/certbot
+	sudo mkdir -p /srv/certbot
+	sudo chown -R www-data:www-data /srv/certbot
 
 	# Install certbot
 	# For uninstall: sudo apt remove certbot
@@ -294,69 +318,100 @@ Install_Certbot() {
 	echo "=> Installed certbot."
 }
 
-# Note: nodesource is used to install node for all users.
-# Ref: https://github.com/nodesource/distributions/blob/master/README.md
-InstallAndSetupNodejs_ViaNodeSource() {
-	printf "Enter node version (current, 16, 18,...): "
-	read node_version
-	printf "Install node ${node_version}? (y/*): "
-	read ans
-	if [[ $ans != "y" ]]; then
-		echo "Aborted"
-		return
-	fi
-
-	curl -fsSL https://deb.nodesource.com/setup_${node_version}.x | sudo -E bash -
-	sudo apt-get install -y nodejs
-
-	# curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
-	# sudo apt-get install -y nodejs
-}
-
 # Note: nvm is used to install node per user (not for all users)
 # Ref: https://github.com/nvm-sh/nvm#installing-and-updating
-InstallAndSetupNodejs_ViaNvm_PreSetup() {
-	# Should use `curl` of ubuntu
-	echo "If curl is not installed, pls install with: sudo apt install curl"
+InstallAndSetupNodejs_ViaNvm() {
+	local NODE_VERSION="$1"
 
-	# Install nvm (node version management)
-	# Need change owner back later at post-phase
-	# sudo mkdir -p /usr/local/nvm
-	# sudo chown $USER:$USER /usr/local/nvm
-	# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | NVM_DIR=/usr/local/nvm bash
-	# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+	if [ -z "$NODE_VERSION" ]; then
+		echo "Usage: InstallAndSetupNodejs_ViaNvm <node_version>"
+		echo "Example: InstallAndSetupNodejs_ViaNvm 18"
+		return 1
+	fi
 
-	echo "[Warn] Please run above command to add nvm to bash. Or otherwise, exit terminal and re-enter to continue setup."
-	echo "And add below command to ~/.bash_profile to ensure ~/.bashrc is loaded well"
-	echo "if [ -f "$HOME/.bashrc" ]; then"
-	echo "	. "$HOME/.bashrc""
-	echo "fi"
-}
-# After installed, should reload terminal (for eg,. source ~/.bashrc, or exit -> re-enter to server)
-InstallAndSetupNodejs_ViaNvm_PostSetup() {
-	# Install and Use node with specific version
-	# Note: 18 means we use latest version, for eg,. 18.2.0
-	nvm install ${NODE_VERSION}
+	echo ">>> Installing NVM if not already installed..."
+	if [ ! -d "$HOME/.nvm" ]; then
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+	else
+		echo "NVM already installed at $HOME/.nvm"
+	fi
 
-	# Switch nodejs version, just use
-	nvm use ${NODE_VERSION}
+	# Load nvm for this script
+	export NVM_DIR="$HOME/.nvm"
+	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-	# Make nodejs available for all users by create symbol link at /usr/local/bin to our installed node, npm
-	# Before it, we need change back owner to root so other users can use node, npm
-	# sudo chown root:root /usr/local/nvm
-	sudo unlink /usr/local/bin/node
-	sudo unlink /usr/local/bin/npm
-	sudo unlink /usr/local/bin/npx
+	echo ">>> Installing Node.js v$NODE_VERSION ..."
+	nvm install "$NODE_VERSION"
+	nvm use "$NODE_VERSION"
+
+	echo ">>> Setting up system-wide symlinks ..."
+	sudo unlink /usr/local/bin/node 2>/dev/null || true
+	sudo unlink /usr/local/bin/npm 2>/dev/null || true
+	sudo unlink /usr/local/bin/npx 2>/dev/null || true
 	sudo ln -s "$(which node)" /usr/local/bin/node
 	sudo ln -s "$(which npm)" /usr/local/bin/npm
 	sudo ln -s "$(which npx)" /usr/local/bin/npx
 
-	# Check path and version
+	echo ">>> Checking installed versions ..."
 	ll /usr/local/bin/node
 	ll /usr/local/bin/npm
 	node -v
 	npm -v
 
-	echo "=> Done install node, npm"
+	echo "=> Done installing Node.js v$NODE_VERSION"
+	echo "And add below command to ~/.bash_profile to ensure ~/.bashrc is loaded well"
+	echo "if [ -f "$HOME/.bashrc" ]; then"
+	echo "	. "$HOME/.bashrc""
+	echo "fi"
+}
+
+Install_Curl() {
+	sudo apt install curl
+}
+
+Install_Zip() {
+	sudo apt install zip
+}
+
+Install_Unzip() {
+	sudo apt install unzip
+}
+
+Install_Docker() {
+	# 1. Uninstall old version first
+	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+	# 2. Setup apt's repo
+	# Add Docker's official GPG key:
+	sudo apt-get update
+	sudo apt-get install ca-certificates curl
+	sudo install -m 0755 -d /etc/apt/keyrings
+	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+	sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+	# Add the repository to Apt sources:
+	echo \
+		"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+		$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+		sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+	sudo apt-get update
+
+	# 3. Install latest version
+	sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+	# 4. Post install
+	# Enable auto-start docker
+	sudo systemctl enable docker
+	sudo systemctl start docker
+
+	# Add current user to Docker group (so we don’t need sudo for every command)
+	sudo usermod -aG docker $USER
+
+	# 4. Verify docker
+	# Check version
+	docker --version
+	docker compose version
+
+	# Check runtime
+	sudo docker run hello-world
 }
