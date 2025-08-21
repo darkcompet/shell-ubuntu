@@ -415,3 +415,18 @@ Install_Docker() {
 	# Check runtime
 	sudo docker run hello-world
 }
+
+Upgrade_Docker() {
+	# 1. Update package information
+	sudo apt-get update
+
+	# 2. Upgrade Docker packages
+	sudo apt-get install --only-upgrade -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+	# 3. Restart docker
+	sudo systemctl restart docker
+
+	# 4. Verify upgrade
+	docker --version
+	docker compose version
+}
