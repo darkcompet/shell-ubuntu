@@ -430,3 +430,10 @@ Upgrade_Docker() {
 	docker --version
 	docker compose version
 }
+
+Install_AwsCli() {
+	sudo apt install -y awscli
+
+	# Config credential (key/secret/region)
+	aws configure
+}
