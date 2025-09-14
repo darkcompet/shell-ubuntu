@@ -437,3 +437,21 @@ Install_AwsCli() {
 	# Config credential (key/secret/region)
 	aws configure
 }
+
+Uninstall_Php() {
+	# Check all versions
+	php -v
+	dpkg -l | grep php
+
+	# Choose one of version (8.2 or all)
+	sudo apt purge 'php8.2*'
+	sudo apt purge 'php*'
+
+	# Remove dependencies
+	sudo apt autoremove --purge -y
+	sudo apt autoclean
+
+	# Verify php removed
+	php -v
+	which php
+}
