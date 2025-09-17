@@ -481,15 +481,12 @@ Install_Kubernetes() {
 
 # Tool for store/pull/push docker image
 Install_Harbor() {
-	#!/bin/bash
 	set -e
 
 	echo "=== Harbor One-Hit Installer for Ubuntu 22.04 ==="
 
 	# --- Ask user input ---
 	read -p "Enter Harbor hostname (e.g., harbor.example.com): " HARBOR_HOST
-	read -p "Enter Harbor admin username [default: admin]: " HARBOR_USER
-	HARBOR_USER=${HARBOR_USER:-admin}
 	read -s -p "Enter Harbor admin password: " HARBOR_PASS
 	echo ""
 	read -s -p "Confirm Harbor admin password: " HARBOR_PASS2
@@ -501,7 +498,7 @@ Install_Harbor() {
 	fi
 
 	echo "✅ Hostname: $HARBOR_HOST"
-	echo "✅ Admin User: $HARBOR_USER"
+	echo "✅ Admin User: admin"
 	echo "-----------------------------------"
 
 	# --- Update system ---
@@ -509,7 +506,7 @@ Install_Harbor() {
 	sudo apt -y full-upgrade
 
 	# --- Install prerequisites ---
-	sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+	sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release openssl
 
 	# --- Install Docker + Compose plugin ---
 	if ! command -v docker >/dev/null 2>&1; then
@@ -530,6 +527,14 @@ Install_Harbor() {
 	tar xzf $HARBOR_PKG
 	sudo mv harbor /opt/harbor
 
+	# --- Generate self-signed cert ---
+	echo "=== Generating self-signed cert for $HARBOR_HOST ==="
+	sudo mkdir -p /opt/harbor/certs
+	openssl req -newkey rsa:4096 -nodes -sha256 \
+		-keyout /opt/harbor/certs/harbor.key \
+		-x509 -days 365 -out /opt/harbor/certs/harbor.crt \
+		-subj "/C=US/ST=State/L=City/O=Org/OU=IT/CN=$HARBOR_HOST"
+
 	# --- Configure Harbor ---
 	cd /opt/harbor
 	cp harbor.yml.tmpl harbor.yml
@@ -538,16 +543,22 @@ Install_Harbor() {
 	sudo sed -i "s/^hostname:.*/hostname: $HARBOR_HOST/" harbor.yml
 	sudo sed -i "s/^harbor_admin_password:.*/harbor_admin_password: $HARBOR_PASS/" harbor.yml
 
-	# If username is not 'admin', update
-	if [ "$HARBOR_USER" != "admin" ]; then
-		sudo sed -i "s/^harbor_admin_password:/harbor_username: $HARBOR_USER\\nharbor_admin_password:/" harbor.yml
-	fi
+	# Enable HTTPS
+	sudo sed -i "s|# https:|https:|" harbor.yml
+	sudo sed -i "s|#   port: 443|  port: 443|" harbor.yml
+	sudo sed -i "s|#   certificate:.*|  certificate: /opt/harbor/certs/harbor.crt|" harbor.yml
+	sudo sed -i "s|#   private_key:.*|  private_key: /opt/harbor/certs/harbor.key|" harbor.yml
 
 	# --- Run Harbor install ---
 	echo "=== Installing Harbor ==="
 	sudo ./install.sh
 
-	echo "=== Harbor Installation Complete ==="
-	echo "👉 Access Harbor UI: http://$HARBOR_HOST"
-	echo "👉 Login with: $HARBOR_USER / $HARBOR_PASS"
+	echo "=== ✅ Harbor Installation Complete ==="
+	echo "👉 Access Harbor UI: https://$HARBOR_HOST"
+	echo "👉 Login with: admin / $HARBOR_PASS"
+	echo ""
+	echo "⚠️ For Docker clients, trust the self-signed cert:"
+	echo "   sudo mkdir -p /etc/docker/certs.d/$HARBOR_HOST"
+	echo "   sudo cp /opt/harbor/certs/harbor.crt /etc/docker/certs.d/$HARBOR_HOST/ca.crt"
+	echo "   sudo systemctl restart docker"
 }
