@@ -478,3 +478,76 @@ Install_Kubernetes() {
 	sudo swapoff -a
 	sudo sed -i '/ swap / s/^/#/' /etc/fstab
 }
+
+# Tool for store/pull/push docker image
+Install_Harbor() {
+	#!/bin/bash
+	set -e
+
+	echo "=== Harbor One-Hit Installer for Ubuntu 22.04 ==="
+
+	# --- Ask user input ---
+	read -p "Enter Harbor hostname (e.g., harbor.example.com): " HARBOR_HOST
+	read -p "Enter Harbor admin username [default: admin]: " HARBOR_USER
+	HARBOR_USER=${HARBOR_USER:-admin}
+	read -s -p "Enter Harbor admin password: " HARBOR_PASS
+	echo ""
+	read -s -p "Confirm Harbor admin password: " HARBOR_PASS2
+	echo ""
+
+	if [ "$HARBOR_PASS" != "$HARBOR_PASS2" ]; then
+		echo "❌ Passwords do not match. Aborting."
+		exit 1
+	fi
+
+	echo "✅ Hostname: $HARBOR_HOST"
+	echo "✅ Admin User: $HARBOR_USER"
+	echo "-----------------------------------"
+
+	# --- Update system ---
+	sudo apt update
+	sudo apt -y full-upgrade
+
+	# --- Install prerequisites ---
+	sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+	# --- Install Docker + Compose plugin ---
+	if ! command -v docker >/dev/null 2>&1; then
+		echo "=== Installing Docker ==="
+		Install_Docker
+	fi
+
+	# --- Download latest Harbor ---
+	cd /tmp
+	HARBOR_URL=$(curl -s https://api.github.com/repos/goharbor/harbor/releases/latest \
+		| grep browser_download_url | grep offline-installer | grep tgz \
+		| cut -d '"' -f 4)
+
+	echo "Downloading Harbor from $HARBOR_URL ..."
+	wget -q --show-progress $HARBOR_URL
+
+	HARBOR_PKG=$(basename $HARBOR_URL)
+	tar xzf $HARBOR_PKG
+	sudo mv harbor /opt/harbor
+
+	# --- Configure Harbor ---
+	cd /opt/harbor
+	cp harbor.yml.tmpl harbor.yml
+
+	# Replace hostname and admin password
+	sudo sed -i "s/^hostname:.*/hostname: $HARBOR_HOST/" harbor.yml
+	sudo sed -i "s/^harbor_admin_password:.*/harbor_admin_password: $HARBOR_PASS/" harbor.yml
+
+	# If username is not 'admin', update
+	if [ "$HARBOR_USER" != "admin" ]; then
+		sudo sed -i "s/^harbor_admin_password:/harbor_username: $HARBOR_USER\\nharbor_admin_password:/" harbor.yml
+	fi
+
+	# --- Run Harbor install ---
+	echo "=== Installing Harbor ==="
+	sudo ./install.sh
+
+	echo "=== Harbor Installation Complete ==="
+	echo "👉 Access Harbor UI: http://$HARBOR_HOST"
+	echo "👉 Login with: $HARBOR_USER / $HARBOR_PASS"
+}
