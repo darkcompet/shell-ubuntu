@@ -525,12 +525,13 @@ Install_Harbor() {
 
 	HARBOR_PKG=$(basename $HARBOR_URL)
 	tar xzf $HARBOR_PKG
+	sudo rm -rf /opt/harbor
 	sudo mv harbor /opt/harbor
 
 	# --- Generate self-signed cert ---
 	echo "=== Generating self-signed cert for $HARBOR_HOST ==="
 	sudo mkdir -p /opt/harbor/certs
-	openssl req -newkey rsa:4096 -nodes -sha256 \
+	sudo openssl req -newkey rsa:4096 -nodes -sha256 \
 		-keyout /opt/harbor/certs/harbor.key \
 		-x509 -days 365 -out /opt/harbor/certs/harbor.crt \
 		-subj "/C=US/ST=State/L=City/O=Org/OU=IT/CN=$HARBOR_HOST"
