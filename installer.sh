@@ -455,3 +455,26 @@ Uninstall_Php() {
 	php -v
 	which php
 }
+
+Install_Kubernetes() {
+	sudo apt update
+	sudo apt install -y apt-transport-https ca-certificates curl
+
+	# Add Kubernetes GPG key
+	sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg \
+		https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+	# Add repo
+	echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] \
+	https://apt.kubernetes.io/ kubernetes-xenial main" | \
+	sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+	# Install kubelet, kubeadm, kubectl
+	sudo apt update
+	sudo apt install -y kubelet kubeadm kubectl
+	sudo apt-mark hold kubelet kubeadm kubectl
+
+	# Disable swap
+	sudo swapoff -a
+	sudo sed -i '/ swap / s/^/#/' /etc/fstab
+}
