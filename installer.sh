@@ -544,11 +544,11 @@ Install_Harbor() {
 	sudo sed -i "s/^hostname:.*/hostname: $HARBOR_HOST/" harbor.yml
 	sudo sed -i "s/^harbor_admin_password:.*/harbor_admin_password: $HARBOR_PASS/" harbor.yml
 
-	# Enable HTTPS
-	sudo sed -i "s|# https:|https:|" harbor.yml
-	sudo sed -i "s|#   port: 443|  port: 443|" harbor.yml
-	sudo sed -i "s|#   certificate:.*|  certificate: /opt/harbor/certs/harbor.crt|" harbor.yml
-	sudo sed -i "s|#   private_key:.*|  private_key: /opt/harbor/certs/harbor.key|" harbor.yml
+	# Enable HTTPS and replace placeholder paths
+	sudo sed -i '/# https:/c\https:' harbor.yml
+	sudo sed -i '/certificate:/c\  certificate: /opt/harbor/certs/harbor.crt' harbor.yml
+	sudo sed -i '/private_key:/c\  private_key: /opt/harbor/certs/harbor.key' harbor.yml
+	sudo sed -i '/port:/c\  port: 443' harbor.yml
 
 	# --- Run Harbor install ---
 	echo "=== Installing Harbor ==="
