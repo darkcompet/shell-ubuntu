@@ -1,6 +1,56 @@
-
-Update_OS() {
+# Update OS packages without remove redundant packages
+Update_Packages() {
+	# apt-get: traditional, stable, backward-compatible -> preferred in automation scripts, CI/CD, production setup
+	# apt: newer, human-friendly (colors, progress bar, concise syntax) -> best for manual interactive use, but interface may change
 	sudo apt-get update -y && sudo apt-get upgrade -y
+}
+
+# Update OS packages with remove redundant packages and clean cache
+# Usage: $0 [mode]
+# mode: safe (default) | full
+# - safe: only upgrade existing packages, no removals
+# - full: may install new packages or remove existing ones if necessary
+Update_Packages_WithAutoRemoveAndClean() {
+	# Default to 'safe' if no argument is passed
+	updateMode=${1:-safe}
+
+	sudo apt-get update -y
+
+	if [ "$updateMode" = "full" ]; then
+		echo "[INFO] Running full upgrade (may install/remove packages)..."
+		sudo apt-get dist-upgrade -y
+	else
+		echo "[INFO] Running safe upgrade (no removals)..."
+		sudo apt-get upgrade -y
+	fi
+
+	echo "[INFO] Cleaning up unused packages and cache..."
+	sudo apt-get autoremove -y
+	sudo apt-get autoclean -y
+
+	echo "[INFO] Update complete!"
+}
+
+# Upgrade OS version (e.g., from 22.04 to 24.04)
+Upgrade_OS() {
+	# Update packages first
+	Update_Packages
+	Update_Packages_WithAutoRemoveAndClean full
+
+	# Start upgrade OS version
+	sudo do-release-upgrade -f DistUpgradeViewNonInteractive
+
+	# Cleanup after upgrade
+	sudo apt-get autoremove -y
+	sudo apt-get autoclean -y
+
+	# Reboot if required
+	if [ -f /var/run/reboot-required ]; then
+		echo "[INFO] Reboot required. Rebooting now..."
+		sudo reboot
+	else
+		echo "[INFO] Upgrade finished. No reboot required."
+	fi
 }
 
 Install_Git() {
@@ -502,8 +552,7 @@ Install_Harbor() {
 	echo "-----------------------------------"
 
 	# --- Update system ---
-	sudo apt update
-	sudo apt -y full-upgrade
+	Update_Packages
 
 	# --- Install prerequisites ---
 	sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release openssl
