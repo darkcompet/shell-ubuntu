@@ -203,11 +203,21 @@ Install_PostgreSQL() {
 	echo "Done !"
 }
 
-# Remove current nginx
 Uninstall_Nginx() {
+	# Stop/disable nginx
 	sudo systemctl stop nginx
-	sudo apt remove --purge nginx nginx-common
-	sudo apt autoremove
+	sudo systemctl disable nginx
+
+	# Remove nginx packages
+	sudo apt purge -y nginx nginx-common nginx-full
+
+	# Remove leftover files
+	sudo rm -rf /etc/nginx
+	sudo rm -rf /var/log/nginx
+	sudo rm -rf /var/cache/nginx
+
+	# Remove unused dependencies
+	sudo apt autoremove -y
 }
 
 # Install latest official mainline package (user will be nginx)
