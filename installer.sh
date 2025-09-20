@@ -543,37 +543,19 @@ Install_Kubernetes() {
 Install_Harbor() {
 	set -e
 
-	echo "=== Harbor One-Hit Installer for Ubuntu 22.04 ==="
-
-	# --- Ask user input ---
-	read -p "Enter Harbor hostname (e.g., harbor.example.com): " HARBOR_HOST
-	read -s -p "Enter Harbor admin password: " HARBOR_PASS
-	echo ""
-	read -s -p "Confirm Harbor admin password: " HARBOR_PASS2
-	echo ""
-
-	if [ "$HARBOR_PASS" != "$HARBOR_PASS2" ]; then
-		echo "❌ Passwords do not match. Aborting."
-		exit 1
-	fi
-
-	echo "✅ Hostname: $HARBOR_HOST"
-	echo "✅ Admin User: admin"
-	echo "-----------------------------------"
-
-	# --- Update system ---
+	# Update OS packages
 	Update_Packages
 
-	# --- Install prerequisites ---
+	# Install dependencies
 	sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release openssl
 
-	# --- Install Docker + Compose plugin ---
+	# Install docker if not installed
 	if ! command -v docker >/dev/null 2>&1; then
 		echo "=== Installing Docker ==="
 		Install_Docker
 	fi
 
-	# --- Download latest Harbor ---
+	# Download latest Harbor
 	cd /tmp
 	HARBOR_URL=$(curl -s https://api.github.com/repos/goharbor/harbor/releases/latest \
 		| grep browser_download_url | grep offline-installer | grep tgz \
@@ -587,36 +569,28 @@ Install_Harbor() {
 	sudo rm -rf /opt/harbor
 	sudo mv harbor /opt/harbor
 
-	# --- Generate self-signed cert ---
-	echo "=== Generating self-signed cert for $HARBOR_HOST ==="
-	sudo mkdir -p /opt/harbor/certs
-	sudo openssl req -newkey rsa:4096 -nodes -sha256 \
-		-keyout /opt/harbor/certs/harbor.key \
-		-x509 -days 365 -out /opt/harbor/certs/harbor.crt \
-		-subj "/C=US/ST=State/L=City/O=Org/OU=IT/CN=$HARBOR_HOST"
-
-	# --- Configure Harbor ---
+	# Configure Harbor
 	cd /opt/harbor
 	cp harbor.yml.tmpl harbor.yml
 
-	# Replace hostname and admin password
-	sudo sed -i "s/^hostname:.*/hostname: $HARBOR_HOST/" harbor.yml
-	sudo sed -i "s/^harbor_admin_password:.*/harbor_admin_password: $HARBOR_PASS/" harbor.yml
+	# Run Harbor install
+	echo "To complete, edit /opt/harbor/harbor.yml, then run install command to install Harbor:"
+	echo "nano /opt/harbor/harbor.yml"
+	echo "sudo /opt/harbor/install.sh"
 
-	# Replace cert
-	sudo sed -i 's|  certificate: /your/certificate/path|  certificate: /opt/harbor/certs/harbor.crt|' harbor.yml
-	sudo sed -i 's|  private_key: /your/private/key/path|  private_key: /opt/harbor/certs/harbor.key|' harbor.yml
+	# # Edit harbor /docker-compose.yml
+	# networks:
+  # proxy:
+  #   external: true
 
-	# --- Run Harbor install ---
-	echo "=== Installing Harbor ==="
-	sudo ./install.sh
-
-	echo "=== ✅ Harbor Installation Complete ==="
-	echo "👉 Access Harbor UI: https://$HARBOR_HOST"
-	echo "👉 Login with: admin / $HARBOR_PASS"
-	echo ""
-	echo "⚠️ For Docker clients, trust the self-signed cert:"
-	echo "   sudo mkdir -p /etc/docker/certs.d/$HARBOR_HOST"
-	echo "   sudo cp /opt/harbor/certs/harbor.crt /etc/docker/certs.d/$HARBOR_HOST/ca.crt"
-	echo "   sudo systemctl restart docker"
+	# services:
+	# 	harbor-core:
+	# 		networks:
+	# 			- proxy
+	# 		labels:
+	# 			- "traefik.enable=true"
+	# 			- "traefik.http.routers.harbor.rule=Host(`harbor.darkcompet.com`)"
+	# 			- "traefik.http.routers.harbor.entrypoints=websecure"
+	# 			- "traefik.http.routers.harbor.tls=true"
+	# 			- "traefik.http.routers.harbor.tls.certresolver=letsencrypt"
 }
