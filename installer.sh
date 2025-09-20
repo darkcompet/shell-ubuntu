@@ -575,7 +575,9 @@ Install_Harbor() {
 
 	# Run Harbor install
 	echo "To complete, edit /opt/harbor/harbor.yml, then run install command to install Harbor:"
+	echo "1. Update hostname, harbor_admin_password. And comment out http/https section since we use traefik for reserve proxy."
 	echo "nano /opt/harbor/harbor.yml"
+	echo "2. Run install script"
 	echo "sudo /opt/harbor/install.sh"
 
 	# # Edit harbor /docker-compose.yml
