@@ -540,7 +540,7 @@ Install_Kubernetes() {
 }
 
 # Tool for store/pull/push docker image
-Install_Harbor() {
+Download_Harbor() {
 	set -e
 
 	# Update OS packages
@@ -572,27 +572,4 @@ Install_Harbor() {
 	# Configure Harbor
 	cd /opt/harbor
 	cp harbor.yml.tmpl harbor.yml
-
-	# Run Harbor install
-	echo "To complete, edit /opt/harbor/harbor.yml, then run install command to install Harbor:"
-	echo "1. Update hostname, harbor_admin_password. And comment out http/https section since we use traefik for reserve proxy."
-	echo "nano /opt/harbor/harbor.yml"
-	echo "2. Run install script"
-	echo "sudo /opt/harbor/install.sh"
-
-	# # Edit harbor /docker-compose.yml
-	# networks:
-  # proxy:
-  #   external: true
-
-	# services:
-	# 	harbor-core:
-	# 		networks:
-	# 			- proxy
-	# 		labels:
-	# 			- "traefik.enable=true"
-	# 			- "traefik.http.routers.harbor.rule=Host(`harbor.darkcompet.com`)"
-	# 			- "traefik.http.routers.harbor.entrypoints=websecure"
-	# 			- "traefik.http.routers.harbor.tls=true"
-	# 			- "traefik.http.routers.harbor.tls.certresolver=letsencrypt"
 }
