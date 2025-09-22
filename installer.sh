@@ -573,3 +573,31 @@ Download_Harbor() {
 	cd /opt/harbor
 	cp harbor.yml.tmpl harbor.yml
 }
+
+Install_Jenkins() {
+	Update_Packages
+
+	# Install Java (OpenJDK 21)
+	sudo apt install -y openjdk-21-jdk
+	java -version
+
+	# Add Jenkins LTS repository with key
+	sudo mkdir -p /etc/apt/keyrings
+	curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /etc/apt/keyrings/jenkins-keyring.asc > /dev/null
+	echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+	# Install Jenkins
+	sudo apt update
+	sudo apt install -y jenkins
+
+	# Start/enable Jenkins
+	sudo systemctl start jenkins
+	sudo systemctl enable jenkins
+
+	# Check status
+	sudo systemctl status jenkins
+
+	echo "Jenkins installed."
+	echo "To access Jenkins web console, open browser at: http://<server-ip>:8080"
+	echo "Get initial admin password by running: sudo cat /var/lib/jenkins/secrets/initialAdminPassword"
+}
