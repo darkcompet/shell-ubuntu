@@ -3,23 +3,26 @@ set -euo pipefail
 
 Docker() {
 	case "$1" in
+		# --- Image ---
+		# Remove image (force remove if used by container)
 		"image-remove")
 			docker rmi -f $2 ;;
 		# Remove all unused images
 		"images-prune")
 			docker image prune -a -f ;;
 
+		# --- Container ---
 		# Access to container shell
 		"container-shell")
 			docker exec -it $2 sh ;;
-		# Remove container
+		# Remove container (force stop if running)
 		"container-remove")
-			docker stop $2
 			docker rm -f $2 ;;
 		# Remove all stopped containers
 		"containers-prune")
 			docker container prune -f ;;
 
+		# --- Volume ---
 		# List volumes
 		"volumes")
 			docker volume ls ;;
@@ -27,6 +30,7 @@ Docker() {
 		"volumes-prune")
 			docker volume prune -f ;;
 
+		# --- Network ---
 		# List networks
 		"networks")
 			docker network ls ;;
@@ -36,7 +40,11 @@ Docker() {
 		# Remove network
 		"network-remove")
 			docker network rm $2 ;;
+		# Remove unused networks
+		"networks-prune")
+			docker network prune -f ;;
 
+		# --- System ---
 		# System details
 		"system")
 			docker system df -v ;;
@@ -49,9 +57,10 @@ Docker() {
 			fi
 
 			docker system prune -a --volumes -f ;;
-		# Default
+
+		# --- Default ---
 		*)
-			echo "Docker commands:"
+			echo "Docker command with arguments:"
 			echo "  image-remove IMAGE_ID|IMAGE_NAME"
 			echo "  images-prune"
 			echo "  container-shell CONTAINER_ID|CONTAINER_NAME"
@@ -62,6 +71,7 @@ Docker() {
 			echo "  networks"
 			echo "  network-inspect NETWORK_ID|NETWORK_NAME"
 			echo "  network-remove NETWORK_ID|NETWORK_NAME"
+			echo "  networks-prune"
 			echo "  system-details"
 			echo "  system-reset" ;;
 	esac
