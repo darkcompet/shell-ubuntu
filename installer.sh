@@ -438,42 +438,46 @@ Install_Unzip() {
 }
 
 Install_Docker() {
-	# 1. Uninstall old version first
-	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+	set -e
 
-	# 2. Setup apt's repo
-	# Add Docker's official GPG key:
+	# Uninstall old Docker versions
+	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+		sudo apt-get remove -y $pkg
+	done
+
+	# Install dependencies
 	sudo apt-get update
-	sudo apt-get install ca-certificates curl
+	sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+	# Set up Docker repository
 	sudo install -m 0755 -d /etc/apt/keyrings
 	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 	sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-	# Add the repository to Apt sources:
 	echo \
 		"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
 		$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
 		sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 	sudo apt-get update
 
-	# 3. Install latest version
+	# Install Docker Engine
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-	# 4. Post install
-	# Enable auto-start docker
+	# Post-install: enable Docker
 	sudo systemctl enable docker
 	sudo systemctl start docker
 
-	# Add current user to Docker group (so we don’t need sudo for every command)
-	sudo usermod -aG docker $USER
+	# Add current user to docker group
+	if ! groups $USER | grep -qw docker; then
+		sudo usermod -aG docker $USER
+		echo "Added $USER to docker group. You need to log out and log back in or run 'newgrp docker' to activate."
+	fi
 
-	# 4. Verify docker
-	# Check version
+	# Verify Docker installation
 	docker --version
 	docker compose version
-
-	# Check runtime
-	sudo docker run hello-world
+	sudo docker run --rm hello-world
 }
 
 Upgrade_Docker() {
@@ -547,31 +551,36 @@ Download_Harbor() {
 	Update_Packages
 
 	# Install dependencies
-	sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release openssl
+	sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release openssl wget tar
 
-	# Install docker if not installed
+	# Install Docker if not installed
 	if ! command -v docker >/dev/null 2>&1; then
-		echo "=== Installing Docker ==="
 		Install_Docker
 	fi
 
-	# Download latest Harbor
-	cd /tmp
+	# Download latest Harbor release
+	cd /tmp || exit
 	HARBOR_URL=$(curl -s https://api.github.com/repos/goharbor/harbor/releases/latest \
 		| grep browser_download_url | grep offline-installer | grep tgz \
 		| cut -d '"' -f 4)
 
 	echo "Downloading Harbor from $HARBOR_URL ..."
-	wget -q --show-progress $HARBOR_URL
+	wget -q --show-progress "$HARBOR_URL"
 
-	HARBOR_PKG=$(basename $HARBOR_URL)
-	tar xzf $HARBOR_PKG
-	sudo rm -rf /opt/harbor
-	sudo mv harbor /opt/harbor
+	HARBOR_PKG=$(basename "$HARBOR_URL")
+	tar xzf "$HARBOR_PKG"
+
+	# Prepare /opt/harbor with correct ownership
+	sudo mkdir -p /opt/harbor
+	sudo chown "$USER":"$USER" /opt/harbor
+	mv harbor /opt/harbor
 
 	# Configure Harbor
-	cd /opt/harbor
+	cd /opt/harbor || exit
 	cp harbor.yml.tmpl harbor.yml
+
+	echo "Harbor downloaded and configured at /opt/harbor"
+	echo "Edit harbor.yml before running 'docker compose up' to start Harbor."
 }
 
 Install_Jenkins() {
