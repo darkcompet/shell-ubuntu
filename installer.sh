@@ -437,6 +437,11 @@ Install_Unzip() {
 	sudo apt install unzip
 }
 
+# For send mail from command line or script
+Install_Msmtp() {
+	sudo apt install -y msmtp msmtp-mta
+}
+
 Install_Docker() {
 	set -e
 
