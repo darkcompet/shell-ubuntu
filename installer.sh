@@ -578,7 +578,9 @@ Download_Harbor() {
 	# Prepare /opt/harbor with correct ownership
 	sudo mkdir -p /opt/harbor
 	sudo chown "$USER":"$USER" /opt/harbor
-	mv harbor /opt/harbor
+	# Move contents (not the directory itself)
+	mv harbor/* /opt/harbor/
+	rm -rf harbor
 
 	# Configure Harbor
 	cd /opt/harbor || exit
