@@ -190,17 +190,78 @@ Install_MySQL() {
 	echo "Done !"
 }
 
+# postgresql-$VERSION
+#   → Actual PostgreSQL server.
+#
+# postgresql-client-$VERSION
+#   → Matching version client tools:
+#        - psql
+#        - pg_dump
+#        - pg_restore
+#   → Avoids version mismatch problems.
+#
+# postgresql-client-common
+#   → Provides "pg_wrapper" to auto-route
+#     commands to correct version.
+#   → REQUIRED in multi-version systems.
+#
+# postgresql-contrib-$VERSION
+#   → MUST HAVE extensions:
+#        - pgcrypto (gen_random_uuid())
+#        - uuid-ossp
+#        - citext
+#        - hstore, intarray
+#        - btree_gin / gist
+#   → Required for EF Core GUID generation.
+#
+# libpq-dev
+#   → Headers for libpq client library.
+#   → Required by EF Core, PHP, Python, Go, Ruby.
 Install_PostgreSQL() {
-	# Update OS and install postgresql
+	# Ask for version
+	read -p "Enter PostgreSQL version to install (eg., 16, 18): " VERSION
+	if [[ -z "$VERSION" ]]; then
+			echo "❌ No version entered. Aborted."
+			return 1
+	fi
+	echo "Installing PostgreSQL $VERSION ..."
+
+	# 1. Update operating system
 	sudo apt update && sudo apt upgrade -y
-	sudo apt install postgresql postgresql-contrib -y
 
-	# Start service and register start at boot time
-	sudo systemctl start postgresql
+	# 2. Install 'postgresql-common'
+	# Reason: required for managing multiple PostgreSQL versions.
+	# Provides:
+	#  - pg_wrapper (auto-selects psql version)
+	#  - cluster management scripts
+	sudo apt install -y postgresql-common
+
+	# 3. Add the official PGDG repository
+	# Reason: Ubuntu repo is usually OLD.
+	# PGDG gives latest PostgreSQL versions.
+	sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+
+	# 4. Install PostgreSQL + essential packages
+	sudo apt install -y \
+		postgresql-$VERSION \
+		postgresql-client-$VERSION \
+		postgresql-client-common \
+		postgresql-contrib-$VERSION \
+		libpq-dev
+
+	# 5. Enable and start PostgreSQL
 	sudo systemctl enable postgresql
+	sudo systemctl start postgresql
 
-	sudo systemctl status postgresql
-	echo "Done !"
+	# 6. Show status + installed versions
+	echo "PostgreSQL service status:"
+	sudo systemctl status postgresql --no-pager
+
+	echo "Installed PostgreSQL versions:"
+	ls /etc/postgresql
+
+	echo "Running clusters:"
+	pg_lsclusters
 }
 
 Uninstall_Nginx() {
